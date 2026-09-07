@@ -1,4 +1,3 @@
-```javascript
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
 
@@ -7,8 +6,8 @@ const player = {
     x: 400,
     y: 300,
     width: 32,
-    height: 32,
-    speed: 5
+    height: 60,
+    speed: 15
 };
 
 // Keyboard input
@@ -24,7 +23,7 @@ document.addEventListener("keyup", (event) => {
 
 // Update player
 function update() {
-    if (keys["w"]) player.y -= player.speed;
+    if (keys["w"]) player.y -= player.speed/100;
     if (keys["s"]) player.y += player.speed;
     if (keys["a"]) player.x -= player.speed;
     if (keys["d"]) player.x += player.speed;
@@ -36,7 +35,7 @@ function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     // Player
-    ctx.fillStyle = "green";
+    ctx.fillStyle = "yellow";
     ctx.fillRect(
         player.x,
         player.y,
@@ -54,4 +53,3 @@ function gameLoop() {
 }
 
 gameLoop();
-```
