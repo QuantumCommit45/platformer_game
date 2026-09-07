@@ -27,6 +27,7 @@ document.addEventListener("keyup", (event) => {
 const inRange = (num, min, max) => num >= min && num <= max;
 
 function inPlatform() {
+    if (player.y+player.height > canvas.height) return true;
     let x = player.x+player.width/2
     let y = player.y+player.height
     for (let i = 0; i < platforms.length; i++) {
@@ -45,7 +46,6 @@ function update() {
     if (inPlatform() && keys["w"]) player.ySpeed = -25;
     if (keys["a"]) player.x -= player.speed;
     if (keys["d"]) player.x += player.speed;
-    if (player.y+player.height > canvas.height) player.y = canvas.height-player.height, player.ySpeed = 0;
 }
 
 // Draw everything
