@@ -8,11 +8,13 @@ const player = {
     width: 32,
     height: 60,
     speed: 15,
-    ySpeed: -10,
+    ySpeed: 0,
 };
 
 // Keyboard input
 const keys = {};
+
+const platforms = [[0,350,400,400],[300,550,800,600]];
 
 document.addEventListener("keydown", (event) => {
     keys[event.key.toLowerCase()] = true;
@@ -22,11 +24,25 @@ document.addEventListener("keyup", (event) => {
     keys[event.key.toLowerCase()] = false;
 });
 
+const inRange = (num, min, max) => num >= min && num <= max;
+
+function inPlatform() {
+    let x = player.x+player.width/2
+    let y = player.y+player.height
+    for (let i = 0; i < platforms.length; i++) {
+        platform = platforms[i];
+        if (inRange(x, platform[0], platform[2])) {
+            return(inRange(y, platform[1], platform[3]))
+        }
+    }
+}
+
 // Update player
 function update() {
+    if (inPlatform() && player.ySpeed >= 0) player.ySpeed = 0
     player.y += player.ySpeed;
     if (player.ySpeed < 20) player.ySpeed += 1;
-    if (keys["w"]) player.ySpeed = -10;
+    if (inPlatform() && keys["w"]) player.ySpeed = -25;
     if (keys["a"]) player.x -= player.speed;
     if (keys["d"]) player.x += player.speed;
 }
@@ -44,6 +60,15 @@ function draw() {
         player.width,
         player.height
     );
+    ctx.fillStyle = "black";
+    for (let i = 0; i < platforms.length; i++) {
+        ctx.fillRect(
+            platforms[i][0],
+            platforms[i][1],
+            platforms[i][2]-platforms[i][0],
+            platforms[i][3]-platforms[i][1]
+        );
+    }
 }
 
 // Game loop
