@@ -33,7 +33,7 @@ function inPlatform() {
     for (let i = 0; i < platforms.length; i++) {
         platform = platforms[i];
         if (inRange(x, platform[0], platform[2])) {
-            return(inRange(y, platform[1], platform[3]))
+            if (inRange(y, platform[1], platform[3])) return(true);
         }
     }
 }
