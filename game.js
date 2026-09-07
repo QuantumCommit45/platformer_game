@@ -14,7 +14,7 @@ const player = {
 // Keyboard input
 const keys = {};
 
-const platforms = [[0,350,400,400],[300,550,800,600]];
+const platforms = [[0,350,300,400],[200,550,800,600]];
 
 document.addEventListener("keydown", (event) => {
     keys[event.key.toLowerCase()] = true;
@@ -33,7 +33,7 @@ function inPlatform() {
     for (let i = 0; i < platforms.length; i++) {
         platform = platforms[i];
         if (inRange(x, platform[0], platform[2])) {
-            return(inRange(y, platform[1], platform[3]))
+            if (inRange(y, platform[1], platform[3])) return(true);
         }
     }
 }
@@ -46,6 +46,11 @@ function update() {
     if (inPlatform() && keys["w"]) player.ySpeed = -25;
     if (keys["a"]) player.x -= player.speed;
     if (keys["d"]) player.x += player.speed;
+    if (player.y >= 1000) {
+        player.x = 400;
+        player.y = 300;
+        player.ySpeed = 0;
+    }
 }
 
 // Draw everything
