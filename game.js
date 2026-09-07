@@ -29,6 +29,7 @@ function update() {
     if (keys["w"]) player.ySpeed = -10;
     if (keys["a"]) player.x -= player.speed;
     if (keys["d"]) player.x += player.speed;
+    if (player.y+player.height > canvas.height) player.y = canvas.height-player.height, player.ySpeed = 0;
 }
 
 // Draw everything
