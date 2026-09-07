@@ -14,7 +14,8 @@ const player = {
 // Keyboard input
 const keys = {};
 
-const platforms = [[0,350,300,400],[200,550,800,600]];
+const platforms = [[-50,350,300,400],[200,550,850,600],[350,150,550,200]];
+const offset = 400-player.width/2
 
 document.addEventListener("keydown", (event) => {
     keys[event.key.toLowerCase()] = true;
@@ -60,17 +61,18 @@ function draw() {
 
     // Player
     ctx.fillStyle = "yellow";
+    yOffset = ((200+player.y)+((200-player.y)**2+500)**0.5)/2
     ctx.fillRect(
-        player.x,
-        player.y,
+        offset,
+        yOffset,
         player.width,
         player.height
     );
     ctx.fillStyle = "black";
     for (let i = 0; i < platforms.length; i++) {
         ctx.fillRect(
-            platforms[i][0],
-            platforms[i][1],
+            platforms[i][0]+offset-player.x,
+            platforms[i][1]+yOffset-player.y,
             platforms[i][2]-platforms[i][0],
             platforms[i][3]-platforms[i][1]
         );
