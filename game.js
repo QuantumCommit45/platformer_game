@@ -7,7 +7,8 @@ const player = {
     y: 300,
     width: 32,
     height: 60,
-    speed: 15
+    speed: 15,
+    ySpeed: -10,
 };
 
 // Keyboard input
@@ -23,8 +24,9 @@ document.addEventListener("keyup", (event) => {
 
 // Update player
 function update() {
-    if (keys["w"]) player.y -= player.speed/100;
-    if (keys["s"]) player.y += player.speed;
+    player.y += player.ySpeed;
+    if (player.ySpeed < 20) player.ySpeed += 1;
+    if (keys["w"]) player.ySpeed = -10;
     if (keys["a"]) player.x -= player.speed;
     if (keys["d"]) player.x += player.speed;
 }
