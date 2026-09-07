@@ -58,7 +58,7 @@ function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     // Player
-    ctx.fillStyle = "yellow";
+    ctx.fillStyle = document.getElementById("colours").value;
     ctx.fillRect(
         player.x,
         player.y,
