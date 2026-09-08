@@ -15,12 +15,11 @@ const player = {
 const keys = {};
 
 
-const mapSize = 64;
+const mapSize = 256;
 const blocks = Array.from({length: mapSize}, () => Array(mapSize).fill(false));
 for (let i = 0; i < Math.floor(mapSize**2/50); i++) {
     let a = Math.floor((Math.random())*(mapSize-2));
     let b = Math.floor(Math.random()**2*mapSize);
-    console.log(a,b)
     blocks[a][b] = true;
     blocks[a+1][b] = true;
     blocks[a+2][b] = true;
@@ -35,7 +34,19 @@ document.addEventListener("keyup", (event) => {
     keys[event.key.toLowerCase()] = false;
 });
 
+document.addEventListener("click", (event) => {
+    clickPos(event.clientX, event.clientY);
+});
+
 const inRange = (num, min, max) => num >= min && num <= max;
+
+let yOffset = 0;
+
+function clickPos(mouseX, mouseY) {
+    let x = Math.floor((mouseX-10+player.x-offset)/50);
+    let y = Math.floor((mouseY-50-yOffset+player.y-10)/-50)+11;
+    blocks[x+mapSize/2][y] = !blocks[x+mapSize/2][y]
+}
 
 function inPlatform() {
     if (player.y+player.height > canvas.height) return true;
