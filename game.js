@@ -177,7 +177,7 @@ function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     // Camera
-    yOffset =((200 - player.y) +Math.sqrt((200 + player.y) ** 2)) / 2;
+    yOffset = ((300 +600-player.y) +Math.sqrt((300 + player.y-600) ** 2+500)) / 2;
 
     // Player
     ctx.fillStyle = "cyan";
