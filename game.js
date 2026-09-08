@@ -138,8 +138,8 @@ function mapBounds(){
 
 function gravity(){
     player.ySpeed -= 1;
-    if (player.ySpeed < -10) {
-        player.ySpeed -=0.01;
+    if (player.ySpeed < -25) {
+        player.ySpeed = -25;
     }
 }
 
