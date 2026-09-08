@@ -18,6 +18,9 @@ const mapSize = 512;
 const blockSize = 50;
 const bottom_floor = 0;
 
+const dirt = new Image();
+dirt.src = "https://minecraft.wiki/images/BlockSprite_dirt.png"
+
 const blocks = Array.from({length: mapSize},() => Array(mapSize).fill(false));
 
 for (let i = 0; i < Math.floor(mapSize ** 2 / 100); i++) {
@@ -207,12 +210,12 @@ function draw() {
 
             let screenY = yOffset - worldY + player.y - blockSize;
 
-            ctx.fillRect(
+            ctx.drawImage(
+                dirt,
                 screenX,
                 screenY,
-                blockSize + 1,
-                blockSize + 1
-            );
+                blockSize,
+                blockSize)
         }
     }
 
