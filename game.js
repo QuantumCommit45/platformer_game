@@ -39,11 +39,26 @@ for (let i = 0; i < Math.floor(mapSize ** 2 / 100); i++) {
 
 const offset = 400 - player.width / 2;
 
+var mouseX = 0;
+var mouseY = 0;
+
 document.addEventListener("keydown", (event) => {keys[event.key.toLowerCase()] = true;});
 
 document.addEventListener("keyup", (event) => {keys[event.key.toLowerCase()] = false;});
 
-document.addEventListener("click", (event) => {clickPos(event.clientX, event.clientY);});
+document.addEventListener("mousedown", (event) => {keys[event.button] = true;});
+
+document.addEventListener("mouseup", (event) => {keys[event.button] = false;});
+
+document.addEventListener("mousemove", (event) => {mouseX = event.clientX; mouseY = event.clientY;});
+
+document.addEventListener(
+    "contextmenu", (event) => {
+        if (event.clientX < 810 && event.clientY < 610) {
+            event.preventDefault();
+        }
+    }
+);
 
 let yOffset = 0;
 
@@ -55,7 +70,7 @@ function worldToBlockX(x) {return Math.floor(x / blockSize) + mapSize / 2;}
 function worldToBlockY(y) {return Math.floor(y / blockSize) + mapSize / 2;}
 
 
-function clickPos(mouseX, mouseY) {
+function clickPos(change) {
     let x = Math.floor((mouseX - 10 + player.x - offset) / blockSize) + mapSize / 2;
 
     // Screen Y increases downward, world Y increases upward
@@ -64,7 +79,7 @@ function clickPos(mouseX, mouseY) {
     let y = Math.floor(worldY / blockSize) + mapSize / 2;
 
     if (x >= 0 &&x < mapSize &&y >= 0 &&y < mapSize) {
-        blocks[x][y] = !blocks[x][y];
+        blocks[x][y] = change;
     }
 }
 
@@ -165,6 +180,9 @@ function update() {
     let moveDir = 0;
     if (keys["a"]) { player.x -= player.speed; moveDir = -1; }
     if (keys["d"]) { player.x += player.speed; moveDir = 1; }
+
+    if (keys[0]) {clickPos(true);}
+    if (keys[2]) {clickPos(false);}
 
     horizontalCollision(moveDir);
 
