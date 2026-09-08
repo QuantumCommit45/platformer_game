@@ -20,6 +20,8 @@ const bottom_floor = 0;
 
 const dirt = new Image();
 dirt.src = "https://minecraft.wiki/images/BlockSprite_dirt.png"
+const grass = new Image();
+grass.src = "https://minecraft.wiki/images/BlockSprite_grass-block.png"
 
 const blocks = Array.from({length: mapSize},() => Array(mapSize).fill(false));
 
@@ -199,6 +201,8 @@ function draw() {
         for (let j = 0; j < mapSize; j++) {
 
             if (blocks[i][j] !== true) continue;
+            texture = dirt
+            if (blocks[i][j+1] !== true) texture = grass;
 
             // Convert block coordinates into world coordinates
             let worldX = (i - mapSize / 2) * blockSize;
@@ -211,7 +215,7 @@ function draw() {
             let screenY = yOffset - worldY + player.y - blockSize;
 
             ctx.drawImage(
-                dirt,
+                texture,
                 screenX,
                 screenY,
                 blockSize,
