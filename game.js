@@ -18,6 +18,9 @@ const mapSize = 512;
 const blockSize = 50;
 const bottom_floor = 0;
 
+const sky = new Image();
+sky.src = "https://minecraft.wiki/images/Day_sky.png"
+
 const dirt = new Image();
 dirt.src = "https://minecraft.wiki/images/BlockSprite_dirt.png"
 const grass = new Image();
@@ -180,7 +183,7 @@ function update() {
 // Draw everything
 function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-
+    ctx.drawImage(sky,0,-600,800,1200);
     // Camera
     yOffset = ((300 +600-player.y) +Math.sqrt((300 + player.y-600) ** 2+500)) / 2;
 
@@ -219,7 +222,8 @@ function draw() {
                 screenX,
                 screenY,
                 blockSize,
-                blockSize)
+                blockSize
+            )
         }
     }
 
