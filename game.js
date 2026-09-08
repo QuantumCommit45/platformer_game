@@ -14,15 +14,15 @@ const player = {
 // Keyboard input
 const keys = {};
 
-const mapSize = 256;
+const mapSize = 512;
 const blockSize = 50;
 const bottom_floor = 0;
 
 const blocks = Array.from({length: mapSize},() => Array(mapSize).fill(false));
 
-for (let i = 0; i < Math.floor(mapSize ** 2 / 50); i++) {
+for (let i = 0; i < Math.floor(mapSize ** 2 / 100); i++) {
     let a = Math.floor(Math.random() * (mapSize - 2));
-    let b = Math.floor(Math.random() ** 2 * mapSize);
+    let b = Math.floor(Math.random() ** 2 * mapSize/2 + mapSize/2);
 
     blocks[a][b] = true;
     blocks[a+1][b] = true;
