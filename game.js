@@ -61,16 +61,23 @@ function clickPos(mouseX, mouseY) {
 }
 
 
-function inPlatform() {
-    // Bottom of player in world coordinates
+function isGrounded() {
     let bottom = player.y;
-
     let x = worldToBlockX(player.x + player.width / 2);
     let y = worldToBlockY(bottom - 1);
     if (x<0||x>=mapSize||y>=mapSize) return false;
-    if (bottom <= bottom_floor) {player.y = bottom_floor; return true;}
-    if (blocks[x][y]) {player.y = (y - mapSize / 2) * blockSize+blockSize; return true;}
-    return false;
+    if (bottom <= bottom_floor) return true;
+    return !!blocks[x][y];
+}
+
+function snapToPlatform() {
+    let bottom = player.y;
+    let x = worldToBlockX(player.x + player.width / 2);
+    let y = worldToBlockY(bottom - 1);
+    if (bottom <= bottom_floor) { player.y = bottom_floor; return; }
+    if (x>=0 && x<mapSize && y<mapSize && blocks[x][y]) {
+        player.y = (y - mapSize / 2) * blockSize + blockSize;
+    }
 }
 
 
@@ -91,16 +98,29 @@ function verticalCollision(){
     if (player.ySpeed < 0&&oldY>blockTop&&player.y<=blockTop&&blocks[x][y]) {player.ySpeed = 0; player.y=blockTop}
 }
 
-function horizontalCollision(){
-    let oldX = player.x;
-    let y = worldToBlockY(player.y - player.height / 2);
-    let x = worldToBlockX(player.x + player.width);
-    let blockLeft= (x - mapSize / 2) * blockSize
-    let blockRight = (x - mapSize / 2) * blockSize+ blockSize
-    
-    if (oldX+player.width<blockLeft&&player.x+player.width>=blockLeft&&blocks[x][y]) {player.x=blockLeft-player.width;}
-    if (oldX>blockRight&&player.x<=blockRight&&blocks[x][y]) {player.x=blockRight;}
+function horizontalCollision(moveDir) {
+    if (moveDir === 0) return;
 
+    let yBottom = worldToBlockY(player.y + 2);
+    let yTop = worldToBlockY(player.y + player.height - 2);
+
+    if (moveDir > 0) {
+        let x = worldToBlockX(player.x + player.width);
+        for (let y of [yTop, yBottom]) {
+            if (x>=0 && x<mapSize && y>=0 && y<mapSize && blocks[x][y]) {
+                let blockLeft = (x - mapSize/2) * blockSize;
+                player.x = blockLeft - player.width;
+            }
+        }
+    } else {
+        let x = worldToBlockX(player.x);
+        for (let y of [yTop, yBottom]) {
+            if (x>=0 && x<mapSize && y>=0 && y<mapSize && blocks[x][y]) {
+                let blockRight = (x - mapSize/2) * blockSize + blockSize;
+                player.x = blockRight;
+            }
+        }
+    }
 }
 
 
@@ -118,8 +138,8 @@ function mapBounds(){
 
 function gravity(){
     player.ySpeed -= 1;
-    if (player.ySpeed < -25) {
-        player.ySpeed = -25;
+    if (player.ySpeed < -10) {
+        player.ySpeed -=0.01;
     }
 }
 
@@ -130,12 +150,16 @@ function update() {
     verticalCollision(); //vertical collision
 
     // Jump
-    if (inPlatform() && keys["w"]) player.ySpeed = 25;
+    let grounded = isGrounded();
+    if (grounded) snapToPlatform();
+    if (grounded && keys["w"]) player.ySpeed = 25;
     // Horizontal movement
-    if (keys["a"]) player.x -= player.speed;
-    if (keys["d"]) player.x += player.speed;
+    let moveDir = 0;
+    if (keys["a"]) { player.x -= player.speed; moveDir = -1; }
+    if (keys["d"]) { player.x += player.speed; moveDir = 1; }
 
-    horizontalCollision();
+    horizontalCollision(moveDir);
+
     mapBounds(); // Keep player inside horizontal map boundaries
     }
 
@@ -156,7 +180,7 @@ function draw() {
     yOffset =((200 - player.y) +Math.sqrt((200 + player.y) ** 2)) / 2;
 
     // Player
-    ctx.fillStyle = "yellow";
+    ctx.fillStyle = "cyan";
 
     ctx.fillRect(
         offset,
@@ -166,7 +190,7 @@ function draw() {
     );
 
     // Blocks
-    ctx.fillStyle = "black";
+    ctx.fillStyle = "green";
 
     for (let i = 0; i < mapSize; i++) {
         for (let j = 0; j < mapSize; j++) {
@@ -197,7 +221,8 @@ function draw() {
 
 function drawCoordinates(){
     ctx.fillStyle = "blue"
-    ctx.fillText(player.x+","+player.y, 10, 20);
+    ctx.font = "30px Garamond"; 
+    ctx.fillText((player.x/blockSize).toFixed(1)+" , "+(player.y/blockSize).toFixed(1), 10, 30);
 }
 
 // Game loop
