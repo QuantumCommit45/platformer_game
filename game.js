@@ -175,7 +175,7 @@ function update() {
     // Jump
     let grounded = isGrounded();
     if (grounded) snapToPlatform();
-    if (grounded && keys["w"]) player.ySpeed = 25;
+    if (grounded && keys["w"]) player.ySpeed = 15;
     // Horizontal movement
     let moveDir = 0;
     if (keys["a"]) { player.x -= player.speed; moveDir = -1; }
