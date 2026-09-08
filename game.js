@@ -74,7 +74,7 @@ function inPlatform() {
 }
 
 
-function horizontalCollision() {
+function outOfBounds() {
     const mapHalfWidth = mapSize * blockSize / 2;
 
     if (player.x + player.width > mapHalfWidth) return true;
@@ -82,41 +82,30 @@ function horizontalCollision() {
     return false;
 }
 
-
-// Update player
-function update() {
-
-    // Gravity
-    player.ySpeed -= 1;
-
-    if (player.ySpeed < -25) {
-        player.ySpeed = -25;
-    }
-
-    // Vertical movement
-
+function verticalCollision(){
     let oldY = player.y;
     player.y += player.ySpeed;
     let y = worldToBlockY(player.y - 1);
     let blockTop= (y - mapSize / 2) * blockSize+ blockSize
     let x = worldToBlockX(player.x + player.width / 2);
     if (player.ySpeed < 0&&oldY>blockTop&&player.y<=blockTop&&blocks[x][y]) {player.ySpeed = 0; player.y=blockTop}
+}
 
-    // Stop falling when standing on a platform
-    //if (inPlatform() && player.ySpeed < 0) player.ySpeed = 0;
-
-    // Jump
-    if (inPlatform() && keys["w"]) player.ySpeed = 25;
-
+function horizontalCollision(){
+    let oldX = player.x;
+    let y = worldToBlockY(player.y - player.height / 2);
+    let x = worldToBlockX(player.x + player.width);
+    let blockLeft= (x - mapSize / 2) * blockSize
+    let blockRight = (x - mapSize / 2) * blockSize+ blockSize
     
+    if (oldX+player.width<blockLeft&&player.x+player.width>=blockLeft&&blocks[x][y]) {player.x=blockLeft-player.width;}
+    if (oldX>blockRight&&player.x<=blockRight&&blocks[x][y]) {player.x=blockRight;}
 
-    // Horizontal movement
-    if (keys["a"]) player.x -= player.speed;
+}
 
-    if (keys["d"]) player.x += player.speed;
 
-    // Keep player inside horizontal map boundaries
-    if (horizontalCollision()) {
+function mapBounds(){
+    if (outOfBounds()) {
         if (player.x + player.width > mapSize * blockSize / 2) {
             player.x = mapSize * blockSize / 2 - player.width;
         }
@@ -124,6 +113,30 @@ function update() {
         if (player.x < -(mapSize * blockSize / 2)) {
             player.x = -(mapSize * blockSize / 2);
         }
+    }
+}
+
+function gravity(){
+    player.ySpeed -= 1;
+    if (player.ySpeed < -25) {
+        player.ySpeed = -25;
+    }
+}
+
+// Update player
+function update() {
+
+    gravity(); 
+    verticalCollision(); //vertical collision
+
+    // Jump
+    if (inPlatform() && keys["w"]) player.ySpeed = 25;
+    // Horizontal movement
+    if (keys["a"]) player.x -= player.speed;
+    if (keys["d"]) player.x += player.speed;
+
+    horizontalCollision();
+    mapBounds(); // Keep player inside horizontal map boundaries
     }
 
     /* Respawn
@@ -133,7 +146,6 @@ function update() {
         player.ySpeed = 0;
     }
     */
-}
 
 
 // Draw everything
