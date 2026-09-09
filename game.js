@@ -124,7 +124,7 @@ function isGrounded() {
     let y = worldToBlockY(bottom - 1);
     if (x<0||x>=mapSize||y>=mapSize) return false;
     if (bottom <= bottom_floor) return true;
-    return !!(blocks[x][y] !== 0);
+    return !!(blocks[x][y] !== 0 && blocks[x][y]<100);
 }
 
 function snapToPlatform() {
