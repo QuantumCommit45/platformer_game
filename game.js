@@ -4,7 +4,7 @@ const ctx = canvas.getContext("2d");
 // Player
 const player = {
     x: 0,
-    y: 0,
+    y: 250,
     width: 30,
     height: 50,
     speed: 15,
@@ -65,6 +65,14 @@ for (let i = 0; i < Math.floor(mapSize ** 2 / 100); i++) {
     blocks[a+1][b] = 2;
     blocks[a+2][b] = 2;
     if (blocks[a+1][b+1] === 0) blocks[a+1][b+1] = 100;
+}
+
+for (let i = 0; i < mapSize; i++) {
+    blocks[i][mapSize/2] = 8;
+    blocks[i][mapSize/2+1] = 1;
+    blocks[i][mapSize/2+2] = 1;
+    blocks[i][mapSize/2+3] = 1;
+    blocks[i][mapSize/2+4] = 2;
 }
 
 const offset = 400 - player.width / 2;
