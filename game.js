@@ -23,7 +23,7 @@ const bottom_floor = 0;
 const sky = new Image();
 sky.src = "https://minecraft.wiki/images/Day_sky.png"
 
-const blockTypes = [["dirt","grass-block","cobblestone","oak-planks","birch-planks","oak-log","obsidian","stone","diamond-ore"],["short-grass"]];
+const blockTypes = [["dirt","grass-block","cobblestone","oak-planks","birch-planks","oak-log","obsidian","stone","diamond-ore","oak-leaves"],["short-grass"]];
 const textures = Array(200).fill()
 
 for (let i = 0; i < blockTypes[0].length; i++) {
@@ -57,22 +57,23 @@ textures.forEach((texture, block) => {
 
 const blocks = Array.from({length: mapSize},() => Array(mapSize).fill(0));
 
-for (let i = 0; i < Math.floor(mapSize ** 2 / 100); i++) {
-    let a = Math.floor(Math.random() * (mapSize - 2));
-    let b = Math.floor(Math.random() ** 2 * mapSize/2 + mapSize/2);
-
-    blocks[a][b] = 2;
-    blocks[a+1][b] = 2;
-    blocks[a+2][b] = 2;
-    if (blocks[a+1][b+1] === 0) blocks[a+1][b+1] = 100;
-}
-
 for (let i = 0; i < mapSize; i++) {
     blocks[i][mapSize/2] = 8;
     blocks[i][mapSize/2+1] = 1;
     blocks[i][mapSize/2+2] = 1;
     blocks[i][mapSize/2+3] = 1;
     blocks[i][mapSize/2+4] = 2;
+}
+
+for (let i = 0; i < Math.floor(mapSize ** 2 / 100); i++) {
+    let a = Math.floor(Math.random() * (mapSize - 2));
+    let b = Math.floor(Math.random() ** 2 * mapSize/2 + mapSize/2);
+    if (!checkBox(a,b,3,1)) continue;
+    blocks[a][b] = 2;
+    blocks[a+1][b] = 2;
+    blocks[a+2][b] = 2;
+    makeTree(a+1,b+1);
+    if (blocks[a+1][b+1] === 0) blocks[a+1][b+1] = 100;
 }
 
 const offset = 400 - player.width / 2;
@@ -100,6 +101,44 @@ document.addEventListener(
 
 let yOffset = 0;
 
+function makeTree(x,y) {
+    if (checkBox(x,y,1,3) && checkBox(x-2,y+2,5,5)) {
+        blocks[x][y] = 6;
+        blocks[x][y+1] = 6;
+        blocks[x-2][y+2] = 10;
+        blocks[x-1][y+2] = 10;
+        blocks[x][y+2] = 6;
+        blocks[x+1][y+2] = 10;
+        blocks[x+2][y+2] = 10;
+        blocks[x-2][y+3] = 10;
+        blocks[x-1][y+3] = 10;
+        blocks[x][y+3] = 6;
+        blocks[x+1][y+3] = 10;
+        blocks[x+2][y+3] = 10;
+        blocks[x-1][y+4] = 10;
+        blocks[x][y+4] = 6;
+        blocks[x+1][y+4] = 10;
+        blocks[x-1][y+5] = 10;
+        blocks[x][y+5] = 10;
+        blocks[x+1][y+5] = 10;
+    }
+}
+
+function checkBox(x1,y1,dx,dy) {
+    for (let i = 0; i < dx; i++) {
+        for (let j = 0; j < dy; j++) {
+            try {
+                if (blocks[i+x1][j+y1] !== 0) {
+                    return false;
+                }
+            }
+            catch (e) {
+                return false;
+            }
+        }
+    }
+    return true;
+}
 
 // Convert world X to block X
 function worldToBlockX(x) {return Math.floor(x / blockSize) + mapSize / 2;}
