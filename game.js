@@ -21,20 +21,28 @@ const bottom_floor = 0;
 const sky = new Image();
 sky.src = "https://minecraft.wiki/images/Day_sky.png"
 
-const dirt = new Image();
-dirt.src = "https://minecraft.wiki/images/BlockSprite_dirt.png"
-const grass = new Image();
-grass.src = "https://minecraft.wiki/images/BlockSprite_grass-block.png"
+const blockTypes = [["dirt","grass-block"],["short-grass"]];
+const textures = Array(200).fill()
 
-const blocks = Array.from({length: mapSize},() => Array(mapSize).fill(false));
+for (let i = 0; i < blockTypes[0].length; i++) {
+    textures[i+1] = new Image;
+    textures[i+1].src = "https://minecraft.wiki/images/BlockSprite_"+blockTypes[0][i]+".png";
+}
+for (let i = 0; i < blockTypes[1].length; i++) {
+    textures[i+100] = new Image;
+    textures[i+100].src = "https://minecraft.wiki/images/BlockSprite_"+blockTypes[1][i]+".png";
+}
+
+const blocks = Array.from({length: mapSize},() => Array(mapSize).fill(0));
 
 for (let i = 0; i < Math.floor(mapSize ** 2 / 100); i++) {
     let a = Math.floor(Math.random() * (mapSize - 2));
     let b = Math.floor(Math.random() ** 2 * mapSize/2 + mapSize/2);
 
-    blocks[a][b] = true;
-    blocks[a+1][b] = true;
-    blocks[a+2][b] = true;
+    blocks[a][b] = 1;
+    blocks[a+1][b] = 1;
+    blocks[a+2][b] = 1;
+    if (blocks[a+1][b+1] === 0) blocks[a+1][b+1] = 100;
 }
 
 const offset = 400 - player.width / 2;
@@ -70,7 +78,7 @@ function worldToBlockX(x) {return Math.floor(x / blockSize) + mapSize / 2;}
 function worldToBlockY(y) {return Math.floor(y / blockSize) + mapSize / 2;}
 
 
-function clickPos(change) {
+function clickPos(placed) {
     let x = Math.floor((mouseX - 10 + player.x - offset) / blockSize) + mapSize / 2;
 
     // Screen Y increases downward, world Y increases upward
@@ -79,7 +87,11 @@ function clickPos(change) {
     let y = Math.floor(worldY / blockSize) + mapSize / 2;
 
     if (x >= 0 &&x < mapSize &&y >= 0 &&y < mapSize) {
-        blocks[x][y] = change;
+        blocks[x][y] = placed;
+    }
+    y+=1;
+    if (x >= 0 &&x < mapSize &&y >= 0 &&y < mapSize && blocks[x][y]>=100) {
+        blocks[x][y] = 0;
     }
 }
 
@@ -90,7 +102,7 @@ function isGrounded() {
     let y = worldToBlockY(bottom - 1);
     if (x<0||x>=mapSize||y>=mapSize) return false;
     if (bottom <= bottom_floor) return true;
-    return !!blocks[x][y];
+    return !!(blocks[x][y] !== 0);
 }
 
 function snapToPlatform() {
@@ -98,7 +110,7 @@ function snapToPlatform() {
     let x = worldToBlockX(player.x + player.width / 2);
     let y = worldToBlockY(bottom - 1);
     if (bottom <= bottom_floor) { player.y = bottom_floor; return; }
-    if (x>=0 && x<mapSize && y<mapSize && blocks[x][y]) {
+    if (x>=0 && x<mapSize && y<mapSize && (blocks[x][y] !== 0 && blocks[x][y]<100)) {
         player.y = (y - mapSize / 2) * blockSize + blockSize;
     }
 }
@@ -118,7 +130,7 @@ function verticalCollision(){
     let y = worldToBlockY(player.y - 1);
     let blockTop= (y - mapSize / 2) * blockSize+ blockSize
     let x = worldToBlockX(player.x + player.width / 2);
-    if (player.ySpeed < 0&&oldY>blockTop&&player.y<=blockTop&&blocks[x][y]) {player.ySpeed = 0; player.y=blockTop}
+    if (player.ySpeed < 0&&oldY>blockTop&&player.y<=blockTop&&(blocks[x][y] !== 0 && blocks[x][y]<100)) {player.ySpeed = 0; player.y=blockTop}
 }
 
 function horizontalCollision(moveDir) {
@@ -130,7 +142,7 @@ function horizontalCollision(moveDir) {
     if (moveDir > 0) {
         let x = worldToBlockX(player.x + player.width);
         for (let y of [yTop, yBottom]) {
-            if (x>=0 && x<mapSize && y>=0 && y<mapSize && blocks[x][y]) {
+            if (x>=0 && x<mapSize && y>=0 && y<mapSize && (blocks[x][y] !== 0 && blocks[x][y]<100)) {
                 let blockLeft = (x - mapSize/2) * blockSize;
                 player.x = blockLeft - player.width;
             }
@@ -138,7 +150,7 @@ function horizontalCollision(moveDir) {
     } else {
         let x = worldToBlockX(player.x);
         for (let y of [yTop, yBottom]) {
-            if (x>=0 && x<mapSize && y>=0 && y<mapSize && blocks[x][y]) {
+            if (x>=0 && x<mapSize && y>=0 && y<mapSize && (blocks[x][y] !== 0 && blocks[x][y]<100)) {
                 let blockRight = (x - mapSize/2) * blockSize + blockSize;
                 player.x = blockRight;
             }
@@ -181,8 +193,8 @@ function update() {
     if (keys["a"]) { player.x -= player.speed; moveDir = -1; }
     if (keys["d"]) { player.x += player.speed; moveDir = 1; }
 
-    if (keys[0]) {clickPos(true);}
-    if (keys[2]) {clickPos(false);}
+    if (keys[0]) {clickPos(1);}
+    if (keys[2]) {clickPos(0);}
 
     horizontalCollision(moveDir);
 
@@ -216,14 +228,12 @@ function draw() {
     );
 
     // Blocks
-    ctx.fillStyle = "green";
 
     for (let i = 0; i < mapSize; i++) {
         for (let j = 0; j < mapSize; j++) {
-
-            if (blocks[i][j] !== true) continue;
-            texture = dirt
-            if (blocks[i][j+1] !== true) texture = grass;
+            if (blocks[i][j] === 0) continue;
+            texture = textures[blocks[i][j]];
+            if (blocks[i][j] === 1 && (blocks[i][j+1] === 0 || blocks[i][j+1] >= 100)) texture = textures[2];
 
             // Convert block coordinates into world coordinates
             let worldX = (i - mapSize / 2) * blockSize;
