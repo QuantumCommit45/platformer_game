@@ -13,6 +13,8 @@ const player = {
 
 // Keyboard input
 const keys = {};
+const mouse = {};
+
 
 const mapSize = 512;
 const blockSize = 50;
@@ -21,7 +23,7 @@ const bottom_floor = 0;
 const sky = new Image();
 sky.src = "https://minecraft.wiki/images/Day_sky.png"
 
-const blockTypes = [["dirt","grass-block"],["short-grass"]];
+const blockTypes = [["dirt","grass-block","cobblestone","oak-planks"],["short-grass"]];
 const textures = Array(200).fill()
 
 for (let i = 0; i < blockTypes[0].length; i++) {
@@ -54,9 +56,9 @@ document.addEventListener("keydown", (event) => {keys[event.key.toLowerCase()] =
 
 document.addEventListener("keyup", (event) => {keys[event.key.toLowerCase()] = false;});
 
-document.addEventListener("mousedown", (event) => {keys[event.button] = true;});
+document.addEventListener("mousedown", (event) => {mouse[event.button] = true;});
 
-document.addEventListener("mouseup", (event) => {keys[event.button] = false;});
+document.addEventListener("mouseup", (event) => {mouse[event.button] = false;});
 
 document.addEventListener("mousemove", (event) => {mouseX = event.clientX; mouseY = event.clientY;});
 
@@ -178,25 +180,45 @@ function gravity(){
     }
 }
 
+function movementKeys(){
+    let grounded = isGrounded();
+    if (grounded) snapToPlatform();
+    if (grounded && keys["w"]) player.ySpeed = 15;
+    let moveDir = 0;
+    if (keys["a"]) { player.x -= player.speed; moveDir = -1; }
+    if (keys["d"]) { player.x += player.speed; moveDir = 1; }
+    horizontalCollision(moveDir);
+}
+
+let selectedBlock = 1;
+
+function hotKeys(){
+    for (let i=1;i<=9;i++){
+        if (keys[i]) selectedBlock = i;
+    }
+    return selectedBlock;
+}
+
+function mouseClicks(selectedBlock){
+    if (mouse[0]){
+        clickPos(0);
+    }
+    else if (mouse[2]){
+        clickPos(selectedBlock);
+    }
+}
+
 // Update player
 function update() {
 
     gravity(); 
     verticalCollision(); //vertical collision
+    movementKeys();
+    selectedBlock = hotKeys();
+    mouseClicks(selectedBlock);
+    
 
-    // Jump
-    let grounded = isGrounded();
-    if (grounded) snapToPlatform();
-    if (grounded && keys["w"]) player.ySpeed = 15;
-    // Horizontal movement
-    let moveDir = 0;
-    if (keys["a"]) { player.x -= player.speed; moveDir = -1; }
-    if (keys["d"]) { player.x += player.speed; moveDir = 1; }
-
-    if (keys[0]) {clickPos(1);}
-    if (keys[2]) {clickPos(0);}
-
-    horizontalCollision(moveDir);
+   
 
     mapBounds(); // Keep player inside horizontal map boundaries
     }
