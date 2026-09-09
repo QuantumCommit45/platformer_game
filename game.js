@@ -4,7 +4,7 @@ const ctx = canvas.getContext("2d");
 // Player
 const player = {
     x: 0,
-    y: 250,
+    y: 3000,
     width: 30,
     height: 50,
     speed: 15,
@@ -58,13 +58,28 @@ textures.forEach((texture, block) => {
 
 const blocks = Array.from({length: mapSize},() => Array(mapSize).fill(0));
 
+const gradients = Array(Math.floor(mapSize/20+2))
+for (let i = 0; i < Math.floor(mapSize/20+2); i++) {
+    gradients[i] = Math.random()*2-1;
+}
+gradients[0] = 1;
+gradients[Math.floor(mapSize/40+1)] *= .001;
+gradients[Math.floor(mapSize/40+1)] *= .001;
+gradients[Math.floor(mapSize/20+2)] = -1;
+
 for (let i = 0; i < mapSize; i++) {
-    blocks[i][mapSize/2] = 8;
-    blocks[i][mapSize/2+1] = 1;
-    blocks[i][mapSize/2+2] = 1;
-    blocks[i][mapSize/2+3] = 1;
-    blocks[i][mapSize/2+4] = 2;
-    foliage(i,mapSize/2+5)
+    let pos = i%20/20;
+    let left = Math.floor(i/20);
+    let a0 = pos*gradients[left];
+    let a1 = (1-pos)*gradients[left+1];
+    let elev = a0+(3*pos**2-2*pos**3)*(a1-a0)
+    elev = Math.floor(elev*40+50+mapSize/2);
+    for (let j = mapSize/2; j<=elev; j++) blocks[i][j] = 8;
+    blocks[i][elev+1] = 1;
+    blocks[i][elev+2] = 1;
+    blocks[i][elev+3] = 1;
+    blocks[i][elev+4] = 2;
+    foliage(i,elev+5)
 }
 
 const offset = 400 - player.width / 2;
