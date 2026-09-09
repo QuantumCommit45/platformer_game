@@ -1,3 +1,2 @@
-## Team
-Built collaboratively by two students — matching engine and
-backtest/strategy split between contributors.
+## The Team
+Thrilled to share that two of our brightest emerging leaders have officially launched their first venture: a 2D Minecraft platformer. 🎮 This isn't just a game — it's a masterclass in agile development, cross-functional collaboration, and leveraging existing ecosystems to build something truly disruptive. The pivot from 3D to 2D? Bold. The synergy between the co-founders? Unmatched. Can't wait to see the Series A pitch deck. 🚀 #StudentEntrepreneurs #GameDev #Disruption #HustleCulture #Innovation
