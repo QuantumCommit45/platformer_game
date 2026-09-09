@@ -23,7 +23,8 @@ const bottom_floor = 0;
 const sky = new Image();
 sky.src = "https://minecraft.wiki/images/Day_sky.png"
 
-const blockTypes = [["dirt","grass-block","cobblestone","oak-planks","birch-planks","oak-log","obsidian","stone","diamond-ore","oak-leaves"],["short-grass"]];
+const blockTypes = [["dirt","grass-block","cobblestone","oak-planks","birch-planks","oak-log","obsidian","stone","diamond-ore","oak-leaves"],
+    ["short-grass","allium","azure-bluet","blue-orchid","cornflower","dandelion","lily-of-the-valley","oxeye-daisy","poppy","orange-tulip","pink-tulip","red-tulip","white-tulip"]];
 const textures = Array(200).fill()
 
 for (let i = 0; i < blockTypes[0].length; i++) {
@@ -63,17 +64,7 @@ for (let i = 0; i < mapSize; i++) {
     blocks[i][mapSize/2+2] = 1;
     blocks[i][mapSize/2+3] = 1;
     blocks[i][mapSize/2+4] = 2;
-}
-
-for (let i = 0; i < Math.floor(mapSize ** 2 / 100); i++) {
-    let a = Math.floor(Math.random() * (mapSize - 2));
-    let b = Math.floor(Math.random() ** 2 * mapSize/2 + mapSize/2);
-    if (!checkBox(a,b,3,1)) continue;
-    blocks[a][b] = 2;
-    blocks[a+1][b] = 2;
-    blocks[a+2][b] = 2;
-    makeTree(a+1,b+1);
-    if (blocks[a+1][b+1] === 0) blocks[a+1][b+1] = 100;
+    foliage(i,mapSize/2+5)
 }
 
 const offset = 400 - player.width / 2;
@@ -100,6 +91,14 @@ document.addEventListener(
 );
 
 let yOffset = 0;
+
+function foliage(x,y) {
+    if (!checkBox(x,y,1,1)) return;
+    let num = Math.random()
+    if (num < .2) makeTree(x,y);
+    else if (num < .4) blocks[x][y] = 100;
+    else if (num < .5) blocks[x][y] = 100+Math.floor(Math.random()*12);
+}
 
 function makeTree(x,y) {
     if (checkBox(x,y,1,3) && checkBox(x-2,y+2,5,5)) {
