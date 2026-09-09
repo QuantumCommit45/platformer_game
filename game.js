@@ -61,9 +61,9 @@ for (let i = 0; i < Math.floor(mapSize ** 2 / 100); i++) {
     let a = Math.floor(Math.random() * (mapSize - 2));
     let b = Math.floor(Math.random() ** 2 * mapSize/2 + mapSize/2);
 
-    blocks[a][b] = 1;
-    blocks[a+1][b] = 1;
-    blocks[a+2][b] = 1;
+    blocks[a][b] = 2;
+    blocks[a+1][b] = 2;
+    blocks[a+2][b] = 2;
     if (blocks[a+1][b+1] === 0) blocks[a+1][b+1] = 100;
 }
 
@@ -285,7 +285,7 @@ function draw() {
         for (let j = 0; j < mapSize; j++) {
             if (blocks[i][j] === 0) continue;
             texture = textures[blocks[i][j]];
-            if (blocks[i][j] === 1 && (blocks[i][j+1] === 0 || blocks[i][j+1] >= 100)) texture = textures[2];
+            if (blocks[i][j] === 2 && (blocks[i][j+1] !== 0 && blocks[i][j+1] < 100)) texture = textures[1];
 
             // Convert block coordinates into world coordinates
             let worldX = (i - mapSize / 2) * blockSize;
