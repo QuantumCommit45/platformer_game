@@ -1,13 +1,32 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <link rel="stylesheet" href="style.css">
     <meta charset="UTF-8">
     <title>2D Minecraft</title>
 </head>
+
 <body>
 
-    <canvas id="game" width="800" height="600" style="border: 2px solid #000000;"></canvas>
+    <div class="game-container">
+
+        <canvas id="game" width="800" height="600" style="border: 2px solid #000000;"></canvas>
+
+        <div class="hotbar">
+            <div class="slot" data-block="1"></div>
+            <div class="slot" data-block="2"></div>
+            <div class="slot" data-block="3"></div>
+            <div class="slot" data-block="4"></div>
+            <div class="slot" data-block="5"></div>
+            <div class="slot" data-block="6"></div>
+            <div class="slot" data-block="7"></div>
+            <div class="slot" data-block="8"></div>
+            <div class="slot" data-block="9"></div>
+        </div>
+
+    </div>
 
     <script src="game.js"></script>
+
 </body>
 </html>

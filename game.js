@@ -23,7 +23,7 @@ const bottom_floor = 0;
 const sky = new Image();
 sky.src = "https://minecraft.wiki/images/Day_sky.png"
 
-const blockTypes = [["dirt","grass-block","cobblestone","oak-planks"],["short-grass"]];
+const blockTypes = [["dirt","grass-block","cobblestone","oak-planks","birch-planks","oak-log","obsidian","stone","diamond-ore"],["short-grass"]];
 const textures = Array(200).fill()
 
 for (let i = 0; i < blockTypes[0].length; i++) {
@@ -34,6 +34,26 @@ for (let i = 0; i < blockTypes[1].length; i++) {
     textures[i+100] = new Image;
     textures[i+100].src = "https://minecraft.wiki/images/BlockSprite_"+blockTypes[1][i]+".png";
 }
+
+textures.forEach((texture, block) => {
+    if (texture) {
+        texture.onload = () => {
+            let slot = document.querySelector(`.slot[data-block="${block}"]`);
+
+            if (slot) {
+                slot.style.backgroundImage = `url(${texture.src})`;
+            }
+        };
+
+        if (texture.complete) {
+            let slot = document.querySelector(`.slot[data-block="${block}"]`);
+
+            if (slot) {
+                slot.style.backgroundImage = `url(${texture.src})`;
+            }
+        }
+    }
+});
 
 const blocks = Array.from({length: mapSize},() => Array(mapSize).fill(0));
 
@@ -208,6 +228,15 @@ function mouseClicks(selectedBlock){
     }
 }
 
+function updateHotbar() {
+    document.querySelectorAll(".slot").forEach(slot => {
+        slot.classList.toggle(
+            "selected",
+            Number(slot.dataset.block) === selectedBlock
+        );
+    });
+}
+
 // Update player
 function update() {
 
@@ -215,6 +244,7 @@ function update() {
     verticalCollision(); //vertical collision
     movementKeys();
     selectedBlock = hotKeys();
+    updateHotbar();
     mouseClicks(selectedBlock);
     
 
