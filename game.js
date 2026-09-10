@@ -74,7 +74,10 @@ for (let i = 0; i < mapSize; i++) {
     let a1 = (1-pos)*gradients[left+1];
     let elev = a0+(3*pos**2-2*pos**3)*(a1-a0)
     elev = Math.floor(elev*40+50+mapSize/2);
-    for (let j = mapSize/2; j<=elev; j++) blocks[i][j] = 8;
+    for (let j = mapSize/2; j<=elev; j++) {
+        blocks[i][j] = 8;
+        if (j<elev-10 && Math.random()<(-j+mapSize/2+100)/10000) blocks[i][j] = 9;
+    }
     blocks[i][elev+1] = 1;
     blocks[i][elev+2] = 1;
     blocks[i][elev+3] = 1;
