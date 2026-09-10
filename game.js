@@ -59,7 +59,7 @@ for (let i = 0; i < blockTypes[4].length; i++) {
     textures[i+400] = new Image;
     textures[i+400].src = "https://minecraft.wiki/images/BlockSprite_"+blockTypes[4][i]+".png";
 }
-console.log(textures);
+
 textures.forEach((texture, block) => {
     if (texture) {
         texture.onload = () => {
@@ -513,7 +513,7 @@ function draw() {
     // Blocks
 
     for (let i = 0; i < mapSize; i++) {
-        for (let j = 0; j < mapSize; j++) {
+        for (let j = mapSize/2; j < mapSize; j++) {
             if (blocks[i][j] === 0) continue;
             texture = textures[blocks[i][j]];
             if (blocks[i][j] === 2 && (blocks[i][j+1] !== 0 && blocks[i][j+1] < 100)) texture = textures[1];
