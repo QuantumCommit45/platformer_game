@@ -553,9 +553,12 @@ function draw() {
 }
 
 function drawCoordinates(){
-    ctx.fillStyle = "blue"
-    ctx.font = "30px Garamond"; 
-    ctx.fillText((player.x/blockSize).toFixed(1)+" , "+(player.y/blockSize).toFixed(1), 10, 30);
+    ctx.fillStyle = "rgba(128, 128, 128, 0.5)";
+    ctx.font = "20px Garamond"; 
+    ctx.fillRect(5, 5, 120, 25);
+    ctx.fillStyle = "white"
+    ctx.textAlign = "center";
+    ctx.fillText((player.x/blockSize).toFixed(1)+" , "+(player.y/blockSize).toFixed(1), 65, 23);
 }
 
 // Game loop
