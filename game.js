@@ -33,7 +33,9 @@ const blockTypes = [
     ["short-grass","allium","azure-bluet","blue-orchid","cornflower",
         "dandelion","lily-of-the-valley","oxeye-daisy","poppy","orange-tulip",
         "pink-tulip","red-tulip","white-tulip"],
-    ["seagrass","flowing-water","stationary-water"]];
+    ["seagrass","flowing-water","stationary-water"],
+    ["bedrock"]];
+
 const textures = Array(300).fill()
 
 for (let i = 0; i < blockTypes[0].length; i++) {
@@ -48,6 +50,11 @@ for (let i = 0; i < blockTypes[2].length; i++) {
     textures[i+200] = new Image;
     textures[i+200].src = "https://minecraft.wiki/images/BlockSprite_"+blockTypes[2][i]+".png";
 }
+for (let i = 0; i < blockTypes[3].length; i++) {
+    textures[i+900] = new Image;
+    textures[i+900].src = "https://minecraft.wiki/images/BlockSprite_"+blockTypes[3][i]+".png";
+}
+
 console.log(textures);
 textures.forEach((texture, block) => {
     if (texture) {
@@ -99,6 +106,8 @@ for (let i = 0; i < mapSize; i++) {
     for (let j = elev+6; j<seaFloor+mapSize/2; j++) {
         blocks[i][j] = 201;
     }
+    blocks[i][256] = 900;
+
 }
 
 function placeSeabed(x,y,upper,lower) {
@@ -252,6 +261,7 @@ function clickPos(placed) {
 }
 
 function breakSpeed(block) {
+    if (block === 900) return 0;
     if (block === 201) return 0;
     if (block >= 100 || block === 10) return 0.9;
     if (block === 8 || block === 3 || block === 4 || block === 5 || block === 6) return .03;
@@ -267,7 +277,7 @@ function isGrounded() {
     if (x<0||x>=mapSize||y>=mapSize) return false;
     if (bottom <= bottom_floor) return true;
     if (blocks[x][y+1] === 200 || blocks[x][y+1] === 201) return true;
-    return !!(blocks[x][y] !== 0 && blocks[x][y]<100);
+    return !!(isSolid(blocks[x][y]));
 }
 
 function snapToPlatform() {
@@ -275,7 +285,7 @@ function snapToPlatform() {
     let x = worldToBlockX(player.x + player.width / 2);
     let y = worldToBlockY(bottom - 1);
     if (bottom <= bottom_floor) { player.y = bottom_floor; return; }
-    if (x>=0 && x<mapSize && y<mapSize && (blocks[x][y] !== 0 && blocks[x][y]<100)) {
+    if (x>=0 && x<mapSize && y<mapSize && (isSolid(blocks[x][y]))) {
         player.y = (y - mapSize / 2) * blockSize + blockSize;
     }
 }
@@ -289,13 +299,20 @@ function outOfBounds() {
     return false;
 }
 
+function isSolid(block_id){
+    if (block_id !== 0 && block_id <100 || block_id === 900){
+        return true
+    }
+    return false
+}
+
 function verticalCollision(){
     let oldY = player.y;
     player.y += player.ySpeed;
     let y = worldToBlockY(player.y - 1);
     let blockTop= (y - mapSize / 2) * blockSize+ blockSize
     let x = worldToBlockX(player.x + player.width / 2);
-    if (player.ySpeed < 0&&oldY>blockTop&&player.y<=blockTop&&(blocks[x][y] !== 0 && blocks[x][y]<100)) {player.ySpeed = 0; player.y=blockTop}
+    if (player.ySpeed < 0&&oldY>blockTop&&player.y<=blockTop&&isSolid(blocks[x][y])) {player.ySpeed = 0; player.y=blockTop}
 }
 
 function horizontalCollision(moveDir) {
@@ -307,7 +324,7 @@ function horizontalCollision(moveDir) {
     if (moveDir > 0) {
         let x = worldToBlockX(player.x + player.width);
         for (let y of [yTop, yBottom]) {
-            if (x>=0 && x<mapSize && y>=0 && y<mapSize && (blocks[x][y] !== 0 && blocks[x][y]<100)) {
+            if (x>=0 && x<mapSize && y>=0 && y<mapSize && (isSolid(blocks[x][y]))) {
                 let blockLeft = (x - mapSize/2) * blockSize;
                 player.x = blockLeft - player.width;
             }
@@ -315,7 +332,7 @@ function horizontalCollision(moveDir) {
     } else {
         let x = worldToBlockX(player.x);
         for (let y of [yTop, yBottom]) {
-            if (x>=0 && x<mapSize && y>=0 && y<mapSize && (blocks[x][y] !== 0 && blocks[x][y]<100)) {
+            if (x>=0 && x<mapSize && y>=0 && y<mapSize && (isSolid(blocks[x][y]))) {
                 let blockRight = (x - mapSize/2) * blockSize + blockSize;
                 player.x = blockRight;
             }
