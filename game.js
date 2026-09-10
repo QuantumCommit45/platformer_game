@@ -6,6 +6,10 @@ var seed = Math.round(Math.random()*10**10);
 if (params.has("seed")) seed = hashCode(params.get("seed"));
 var instaMine = false;
 if (params.has("instamine")) instaMine = (params.get("instamine")==="true");
+var flight = false;
+if (params.has("flight")) flight = (params.get("flight")==="true");
+var noClip = false;
+if (params.has("noclip")) noClip = (params.get("noclip")==="true");
 console.log(seed);
 const generate = mulberry32(seed);
 
@@ -376,6 +380,7 @@ function breakSpeed(block) {
 }
 
 function isGrounded() {
+    if (flight) return true;
     let bottom = player.y;
     let x = worldToBlockX(player.x + player.width / 2);
     let y = worldToBlockY(bottom - 1);
@@ -422,6 +427,7 @@ function verticalCollision(){
 
 function horizontalCollision(moveDir) {
     if (moveDir === 0) return;
+    if (noClip) return;
 
     let yBottom = worldToBlockY(player.y + 2);
     let yTop = worldToBlockY(player.y + player.height - 2);
