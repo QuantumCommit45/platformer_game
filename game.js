@@ -271,6 +271,21 @@ function flood(x,y,end){
         flood(x-1,y+1,true);
     }
 }
+
+function drop(){
+    if (frame%15 !== 1) return;
+    for (let i = 0; i < mapSize; i++) {
+        for (let j = mapSize; j > mapSize/2; j--) {
+            try {
+                if (blocks[i][j] === 11 && blocks[i][j-1] === 0) {
+                    blocks[i][j] = 0;
+                    blocks[i][j-1] = 11;
+                }
+            }
+            catch (e) {}
+        }
+    }
+}
 // Convert world X to block X
 function worldToBlockX(x) {return Math.floor(x / blockSize) + mapSize / 2;}
 
@@ -461,6 +476,7 @@ function update() {
     updateHotbar();
     mouseClicks(selectedBlock);
     flow();
+    drop();
     
 
    
