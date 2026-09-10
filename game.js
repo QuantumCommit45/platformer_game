@@ -36,7 +36,7 @@ sky.src = "https://minecraft.wiki/images/Day_sky.png"
 
 const blockTypes = [
     ["dirt","grass-block","cobblestone","oak-planks","birch-planks",
-        "oak-log","obsidian","stone","glass","oak-leaves","gravel"],
+        "oak-log","obsidian","stone","glass","oak-leaves","gravel","pumpkin","melon"],
     ["short-grass","allium","azure-bluet","blue-orchid","cornflower",
         "dandelion","lily-of-the-valley","oxeye-daisy","poppy","orange-tulip",
         "pink-tulip","red-tulip","white-tulip"],
@@ -213,7 +213,8 @@ function foliage(x,y) {
     let num = generate()
     if (num < .2) makeTree(x,y);
     else if (num < .4) blocks[x][y] = 100;
-    else if (num < .5) blocks[x][y] = 100+Math.floor(generate()*12);
+    else if (num < .5) blocks[x][y] = 100+Math.floor(generate()*15);
+    if (blocks[x][y] === 114 || blocks[x][y] === 113) blocks[x][y]-= 101
 }
 
 function makeTree(x,y) {
