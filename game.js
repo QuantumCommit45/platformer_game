@@ -546,11 +546,14 @@ function update() {
 
     /* Respawn
     if (player.y < -1000) {
-        player.x = 0;
-        player.y = 0;
-        player.ySpeed = 0;
+        respawn()
     }
     */
+function respawn() {
+    player.x = 0;
+    player.y = 3000;
+    player.ySpeed = 0;
+}
 
 
 // Draw everything
