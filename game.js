@@ -1,6 +1,14 @@
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
 
+const params = new URLSearchParams(window.location.search);
+var seed = Math.round(Math.random()*10**10);
+if (params.has("seed")) seed = parseInt(params.get("seed"),10);
+var instaMine = false;
+if (params.has("instamine")) instaMine = (params.get("instamine")==="true");
+console.log(seed);
+const generate = mulberry32(seed);
+
 // Player
 const player = {
     x: 0,
@@ -84,7 +92,7 @@ const blocks = Array.from({length: mapSize},() => Array(mapSize).fill(0));
 
 const gradients = Array(Math.floor(mapSize/20+2))
 for (let i = 0; i < Math.floor(mapSize/20+2); i++) {
-    gradients[i] = Math.random()*2-1;
+    gradients[i] = generate()*2-1;
 }
 gradients[0] = 1;
 gradients[Math.floor(mapSize/40+1)] *= .001;
@@ -103,15 +111,15 @@ for (let i = 0; i < mapSize; i++) {
     elev = Math.floor(elev*40+50+mapSize/2);
     for (let j = mapSize/2; j<=elev; j++) {
         blocks[i][j] = 8;
-        if (j<elev-10 && Math.random()<(-j+mapSize/2+100)/10000) blocks[i][j] = 203;
-        if (j<elev-10 && Math.random()<(-j+mapSize/2+100)/500) blocks[i][j] = 400;
-        if (j<elev-10 && Math.random()<(-j+mapSize/2+100)/2000) blocks[i][j] = 401;
-        if (j<elev-10 && Math.random()<(-j+mapSize/2+100)/5000) blocks[i][j] = 402;
-        if (j<elev-10 && Math.random()<(-j+mapSize/2+100)/5000) blocks[i][j] = 403; //LOTS OF ORES
-        if (j<elev-10 && Math.random()<(-j+mapSize/2+100)/5000) blocks[i][j] = 404;
-        if (j<elev-10 && Math.random()<(-j+mapSize/2+100)/5000) blocks[i][j] = 405;
-        if (j<elev-10 && Math.random()<(-j+mapSize/2+100)/5000) blocks[i][j] = 406;
-        if (j<elev-10 && Math.random()<(-j+mapSize/2+100)/5000) blocks[i][j] = 407;
+        if (j<elev-10 && generate()<(-j+mapSize/2+100)/10000) blocks[i][j] = 203;
+        if (j<elev-10 && generate()<(-j+mapSize/2+100)/500) blocks[i][j] = 400;
+        if (j<elev-10 && generate()<(-j+mapSize/2+100)/2000) blocks[i][j] = 401;
+        if (j<elev-10 && generate()<(-j+mapSize/2+100)/5000) blocks[i][j] = 402;
+        if (j<elev-10 && generate()<(-j+mapSize/2+100)/5000) blocks[i][j] = 403; //LOTS OF ORES
+        if (j<elev-10 && generate()<(-j+mapSize/2+100)/5000) blocks[i][j] = 404;
+        if (j<elev-10 && generate()<(-j+mapSize/2+100)/5000) blocks[i][j] = 405;
+        if (j<elev-10 && generate()<(-j+mapSize/2+100)/5000) blocks[i][j] = 406;
+        if (j<elev-10 && generate()<(-j+mapSize/2+100)/5000) blocks[i][j] = 407;
         
     }
     //Make caves
@@ -121,15 +129,15 @@ for (let i = 0; i < mapSize; i++) {
         if (caveY-1!=256){blocks[caveX][caveY -1] = 0;}
 
         caveX += coinFlip();
-        if (Math.random() < 0.4) {
+        if (generate() < 0.4) {
         caveY += coinFlip();
         }
     }
 
     //Maybe make another cave
-    if (Math.random() < 0.05) {
+    if (generate() < 0.05) {
     caveX = i;
-    caveY = elev-((Math.floor(Math.random() * 50))+10);
+    caveY = elev-((Math.floor(generate() * 50))+10);
     }
     placeSeabed(i,elev+1,1,11);
     placeSeabed(i,elev+2,1,11);
@@ -144,11 +152,19 @@ for (let i = 0; i < mapSize; i++) {
 }
 
 function coinFlip(){
-    let coin = Math.round(Math.random());
+    let coin = Math.round(generate());
     if (coin == 0){return -1;}
     else{return 1;}
 }
 
+function mulberry32(a) { //thx Gemini
+    return function() {
+      let t = a += 0x6D2B79F5;
+      t = Math.imul(t ^ (t >>> 15), t | 1);
+      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    }
+}
 
 
 function placeSeabed(x,y,upper,lower) {
@@ -189,15 +205,15 @@ let yOffset = 0;
 function foliage(x,y) {
     if (!checkBox(x,y,1,1)) return;
     if (y<seaFloor+mapSize/2) {
-        if (Math.random()<.5) blocks[x][y] = 200;
+        if (generate()<.5) blocks[x][y] = 200;
         else blocks[x][y] = 201;
         return;
     }
     if (y === seaFloor+mapSize/2) return;
-    let num = Math.random()
+    let num = generate()
     if (num < .2) makeTree(x,y);
     else if (num < .4) blocks[x][y] = 100;
-    else if (num < .5) blocks[x][y] = 100+Math.floor(Math.random()*12);
+    else if (num < .5) blocks[x][y] = 100+Math.floor(generate()*12);
 }
 
 function makeTree(x,y) {
@@ -346,9 +362,9 @@ function clickPos(placed) {
 }
 
 function breakSpeed(block) {
-    //return 1; //comment this out after testing.
-    if (block === 900) return 0;
     if (block === 201 || block === 203) return 0;
+    if (instaMine) return 1;
+    if (block === 900) return 0;
     if (block >= 400) return .03; //break speed for ores.
     if (block >= 100 || block === 10 ) return 0.9;
     if (block === 8 || block === 3 || block === 4 || block === 5 || block === 6) return .03;
