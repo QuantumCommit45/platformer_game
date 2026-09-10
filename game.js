@@ -28,13 +28,14 @@ sky.src = "https://minecraft.wiki/images/Day_sky.png"
 
 const blockTypes = [
     ["dirt","grass-block","cobblestone","oak-planks","birch-planks",
-        "oak-log","obsidian","stone","diamond-ore","oak-leaves",
+        "oak-log","obsidian","stone","lava","oak-leaves",
         "gravel"],
     ["short-grass","allium","azure-bluet","blue-orchid","cornflower",
         "dandelion","lily-of-the-valley","oxeye-daisy","poppy","orange-tulip",
         "pink-tulip","red-tulip","white-tulip"],
     ["seagrass","flowing-water","stationary-water"],
-    ["bedrock"]];
+    ["bedrock"],
+    ["coal-ore", "iron-ore", "copper-ore", "gold-ore", "redstone-ore", "lapis-lazuli-ore", "diamond-ore", "emerald-ore"]];
 
 const textures = Array(300).fill()
 
@@ -54,7 +55,10 @@ for (let i = 0; i < blockTypes[3].length; i++) {
     textures[i+900] = new Image;
     textures[i+900].src = "https://minecraft.wiki/images/BlockSprite_"+blockTypes[3][i]+".png";
 }
-
+for (let i = 0; i < blockTypes[4].length; i++) {
+    textures[i+400] = new Image;
+    textures[i+400].src = "https://minecraft.wiki/images/BlockSprite_"+blockTypes[4][i]+".png";
+}
 console.log(textures);
 textures.forEach((texture, block) => {
     if (texture) {
@@ -87,16 +91,45 @@ gradients[Math.floor(mapSize/40+1)] *= .001;
 gradients[Math.floor(mapSize/40+1)] *= .001;
 gradients[Math.floor(mapSize/20+2)] = -1;
 
+let caveX = 0;
+let caveY = mapSize / 2 + 30;
 for (let i = 0; i < mapSize; i++) {
     let pos = i%20/20;
     let left = Math.floor(i/20);
     let a0 = pos*gradients[left];
     let a1 = (1-pos)*gradients[left+1];
     let elev = a0+(3*pos**2-2*pos**3)*(a1-a0)
+    
     elev = Math.floor(elev*40+50+mapSize/2);
     for (let j = mapSize/2; j<=elev; j++) {
         blocks[i][j] = 8;
         if (j<elev-10 && Math.random()<(-j+mapSize/2+100)/10000) blocks[i][j] = 9;
+        if (j<elev-10 && Math.random()<(-j+mapSize/2+100)/500) blocks[i][j] = 400;
+        if (j<elev-10 && Math.random()<(-j+mapSize/2+100)/2000) blocks[i][j] = 401;
+        if (j<elev-10 && Math.random()<(-j+mapSize/2+100)/5000) blocks[i][j] = 402;
+        if (j<elev-10 && Math.random()<(-j+mapSize/2+100)/5000) blocks[i][j] = 403; //LOTS OF ORES
+        if (j<elev-10 && Math.random()<(-j+mapSize/2+100)/5000) blocks[i][j] = 404;
+        if (j<elev-10 && Math.random()<(-j+mapSize/2+100)/5000) blocks[i][j] = 405;
+        if (j<elev-10 && Math.random()<(-j+mapSize/2+100)/5000) blocks[i][j] = 406;
+        if (j<elev-10 && Math.random()<(-j+mapSize/2+100)/5000) blocks[i][j] = 407;
+        
+    }
+    //Make caves
+    if (caveX >= 1 && caveX < mapSize-1 && caveY >= mapSize/2+1 && caveY < mapSize-1){
+        blocks[caveX + 1][caveY] = 0;
+        blocks[caveX - 1][caveY] = 0;
+        blocks[caveX][caveY + 1] = 0;
+        blocks[caveX][caveY - 1] = 0;
+        caveX += coinFlip();
+        if (Math.random() < 0.4) {
+        caveY += coinFlip();
+        }
+    }
+
+    //Maybe make another cave
+    if (Math.random() < 0.05) {
+    caveX = i;
+    caveY = elev-((Math.floor(Math.random() * 50))+10);
     }
     placeSeabed(i,elev+1,1,11);
     placeSeabed(i,elev+2,1,11);
@@ -109,6 +142,14 @@ for (let i = 0; i < mapSize; i++) {
     blocks[i][256] = 900;
 
 }
+
+function coinFlip(){
+    let coin = Math.round(Math.random());
+    if (coin == 0){return -1;}
+    else{return 1;}
+}
+
+
 
 function placeSeabed(x,y,upper,lower) {
     if (y<seaFloor+mapSize/2) {blocks[x][y] = lower;}
@@ -261,10 +302,13 @@ function clickPos(placed) {
 }
 
 function breakSpeed(block) {
+    return 1; //comment this out after testing.
     if (block === 900) return 0;
     if (block === 201) return 0;
+    if (block >= 400) return .03; //break speed for ores.
     if (block >= 100 || block === 10) return 0.9;
     if (block === 8 || block === 3 || block === 4 || block === 5 || block === 6) return .03;
+    
     if (block === 7) return .0005;
     if (block === 9) return .01;
     return .1;
@@ -300,7 +344,7 @@ function outOfBounds() {
 }
 
 function isSolid(block_id){
-    if (block_id !== 0 && block_id <100 || block_id === 900){
+    if (block_id !== 0 && block_id <100 || block_id === 900 || block_id >= 400){
         return true
     }
     return false
