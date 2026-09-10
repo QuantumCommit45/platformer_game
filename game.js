@@ -90,6 +90,11 @@ const offset = 400 - player.width / 2;
 var mouseX = 0;
 var mouseY = 0;
 
+var breakingX = 0;
+var breakingY = 0;
+var breakingTime = 1.0;
+
+
 document.addEventListener("keydown", (event) => {keys[event.key.toLowerCase()] = true;});
 
 document.addEventListener("keyup", (event) => {keys[event.key.toLowerCase()] = false;});
@@ -171,7 +176,11 @@ function clickPos(placed) {
     let worldY = player.y - (mouseY - yOffset - 10);
 
     let y = Math.floor(worldY / blockSize) + mapSize / 2;
-
+    if (placed === 0) {
+        if (x===breakingX && y===breakingY) {breakingTime-=breakSpeed(blocks[x][y]);}
+        else {breakingTime = 1.0; breakingX=x; breakingY=y;}
+        if (breakingTime > 0) return;
+    }
     if (x >= 0 &&x < mapSize &&y >= 0 &&y < mapSize) {
         blocks[x][y] = placed;
     }
@@ -181,6 +190,13 @@ function clickPos(placed) {
     }
 }
 
+function breakSpeed(block) {
+    if (block >= 100 || block === 10) return 1;
+    if (block === 8 || block === 3 || block === 4 || block === 5 || block === 6) return .03;
+    if (block === 7) return .0005;
+    if (block === 9) return .01;
+    return .1;
+}
 
 function isGrounded() {
     let bottom = player.y;
