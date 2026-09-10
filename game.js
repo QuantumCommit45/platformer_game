@@ -116,10 +116,10 @@ for (let i = 0; i < mapSize; i++) {
     }
     //Make caves
     if (caveX >= 1 && caveX < mapSize-1 && caveY >= mapSize/2+1 && caveY < mapSize-1){
-        blocks[caveX + 1][caveY] = 0;
-        blocks[caveX - 1][caveY] = 0;
-        blocks[caveX][caveY + 1] = 0;
-        blocks[caveX][caveY - 1] = 0;
+        if (caveY!=256){blocks[caveX + 1][caveY] = 0; blocks[caveX - 1][caveY] = 0;}
+        if (caveY+1!=256){blocks[caveX][caveY + 1] = 0;}
+        if (caveY-1!=256){blocks[caveX][caveY -1] = 0;}
+
         caveX += coinFlip();
         if (Math.random() < 0.4) {
         caveY += coinFlip();
