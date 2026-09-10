@@ -11,6 +11,8 @@ const player = {
     ySpeed: 0,
 };
 
+var frame = 0;
+
 // Keyboard input
 const keys = {};
 const mouse = {};
@@ -19,12 +21,18 @@ const mouse = {};
 const mapSize = 512;
 const blockSize = 50;
 const bottom_floor = 0;
+const seaFloor = 50;
 
 const sky = new Image();
 sky.src = "https://minecraft.wiki/images/Day_sky.png"
 
-const blockTypes = [["dirt","grass-block","cobblestone","oak-planks","birch-planks","oak-log","obsidian","stone","diamond-ore","oak-leaves"],
-    ["short-grass","allium","azure-bluet","blue-orchid","cornflower","dandelion","lily-of-the-valley","oxeye-daisy","poppy","orange-tulip","pink-tulip","red-tulip","white-tulip"]];
+const blockTypes = [["dirt","grass-block","cobblestone","oak-planks","birch-planks",
+        "oak-log","obsidian","stone","diamond-ore","oak-leaves",
+        "gravel"],
+    ["short-grass","allium","azure-bluet","blue-orchid","cornflower",
+        "dandelion","lily-of-the-valley","oxeye-daisy","poppy","orange-tulip",
+        "pink-tulip","red-tulip","white-tulip","seagrass","flowing-water",
+        "stationary-water"]];
 const textures = Array(200).fill()
 
 for (let i = 0; i < blockTypes[0].length; i++) {
@@ -78,11 +86,19 @@ for (let i = 0; i < mapSize; i++) {
         blocks[i][j] = 8;
         if (j<elev-10 && Math.random()<(-j+mapSize/2+100)/10000) blocks[i][j] = 9;
     }
-    blocks[i][elev+1] = 1;
-    blocks[i][elev+2] = 1;
-    blocks[i][elev+3] = 1;
-    blocks[i][elev+4] = 2;
+    placeSeabed(i,elev+1,1,11);
+    placeSeabed(i,elev+2,1,11);
+    placeSeabed(i,elev+3,1,11);
+    placeSeabed(i,elev+4,2,11);
     foliage(i,elev+5)
+    for (let j = elev+6; j<seaFloor+mapSize/2; j++) {
+        blocks[i][j] = 114;
+    }
+}
+
+function placeSeabed(x,y,upper,lower) {
+    if (y<seaFloor+mapSize/2) {blocks[x][y] = lower;}
+    else {blocks[x][y] = upper;}
 }
 
 const offset = 400 - player.width / 2;
@@ -117,6 +133,11 @@ let yOffset = 0;
 
 function foliage(x,y) {
     if (!checkBox(x,y,1,1)) return;
+    if (y<seaFloor+mapSize/2) {
+        if (Math.random()<.5) blocks[x][y] = 113;
+        else blocks[x][y] = 114;
+        return;
+    }
     let num = Math.random()
     if (num < .2) makeTree(x,y);
     else if (num < .4) blocks[x][y] = 100;
@@ -162,6 +183,39 @@ function checkBox(x1,y1,dx,dy) {
     return true;
 }
 
+function flow(){
+    if (frame%15 !== 1) return;
+    for (let i = 0; i < mapSize; i++) {
+        for (let j = mapSize/2; j < mapSize; j++) {
+            try {
+                if (blocks[i][j] === 114) {
+                    flood(i,j-1,false);
+                }
+            }
+            catch (e) {}
+        }
+    }
+    for (let i = 0; i < mapSize; i++) {
+        for (let j = mapSize/2; j < mapSize; j++) {
+            try {
+                if (blocks[i][j] === -1) {
+                    blocks[i][j] = 114;
+                }
+            }
+            catch (e) {}
+        }
+    }
+}
+
+function flood(x,y,end){
+    if (blocks[x][y] === 0 || (blocks[x][y] >=100 && blocks[x][y] <113)) {
+        blocks[x][y] = -1;
+    }
+    else if (!end && blocks[x][y] !== 114) {
+        flood(x+1,y+1,true);
+        flood(x-1,y+1,true);
+    }
+}
 // Convert world X to block X
 function worldToBlockX(x) {return Math.floor(x / blockSize) + mapSize / 2;}
 
@@ -182,16 +236,19 @@ function clickPos(placed) {
         if (breakingTime > 0) return;
     }
     if (x >= 0 &&x < mapSize &&y >= 0 &&y < mapSize) {
+        if (blocks[x][y] === 113) {blocks[x][y] = 114; breakingTime = 1; return;}
         blocks[x][y] = placed;
+        if (placed === 0) breakingTime = 1;
     }
     y+=1;
-    if (x >= 0 &&x < mapSize &&y >= 0 &&y < mapSize && blocks[x][y]>=100) {
+    if (x >= 0 &&x < mapSize &&y >= 0 &&y < mapSize && blocks[x][y]>=100 && blocks[x][y]!==114) {
         blocks[x][y] = 0;
     }
 }
 
 function breakSpeed(block) {
-    if (block >= 100 || block === 10) return 1;
+    if (block === 114) return 0;
+    if (block >= 100 || block === 10) return 0.9;
     if (block === 8 || block === 3 || block === 4 || block === 5 || block === 6) return .03;
     if (block === 7) return .0005;
     if (block === 9) return .01;
@@ -204,6 +261,7 @@ function isGrounded() {
     let y = worldToBlockY(bottom - 1);
     if (x<0||x>=mapSize||y>=mapSize) return false;
     if (bottom <= bottom_floor) return true;
+    if (blocks[x][y+1] === 113 || blocks[x][y+1] === 114) return true;
     return !!(blocks[x][y] !== 0 && blocks[x][y]<100);
 }
 
@@ -275,6 +333,12 @@ function mapBounds(){
 
 function gravity(){
     player.ySpeed -= 1;
+    if (player.ySpeed < -5) {
+        let bottom = player.y;
+        let x = worldToBlockX(player.x + player.width / 2);
+        let y = worldToBlockY(bottom - 1);
+        if (blocks[x][y]===114 || blocks[x][y]===113) player.ySpeed = -5;
+    }
     if (player.ySpeed < -25) {
         player.ySpeed = -25;
     }
@@ -326,6 +390,7 @@ function update() {
     selectedBlock = hotKeys();
     updateHotbar();
     mouseClicks(selectedBlock);
+    flow();
     
 
    
@@ -376,7 +441,18 @@ function draw() {
             let screenX = worldX + offset - player.x;
 
             let screenY = yOffset - worldY + player.y - blockSize;
-
+            if (blocks[i][j] === 113) {
+                water = 114;
+                if (blocks[i][j+1] !== 114) water = 115;
+                ctx.drawImage(
+                    textures[water],
+                    screenX,
+                    screenY,
+                    blockSize,
+                    blockSize
+                )
+            }
+            if (blocks[i][j] === 114 && blocks[i][j+1] !== 114) texture = textures[115];
             ctx.drawImage(
                 texture,
                 screenX,
@@ -400,6 +476,7 @@ function drawCoordinates(){
 function gameLoop() {
     update();
     draw();
+    frame+=1;
 
     requestAnimationFrame(gameLoop);
 }
