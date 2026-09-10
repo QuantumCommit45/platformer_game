@@ -28,14 +28,14 @@ sky.src = "https://minecraft.wiki/images/Day_sky.png"
 
 const blockTypes = [
     ["dirt","grass-block","cobblestone","oak-planks","birch-planks",
-        "oak-log","obsidian","stone","lava","oak-leaves",
-        "gravel"],
+        "oak-log","obsidian","stone","glass","oak-leaves","gravel"],
     ["short-grass","allium","azure-bluet","blue-orchid","cornflower",
         "dandelion","lily-of-the-valley","oxeye-daisy","poppy","orange-tulip",
         "pink-tulip","red-tulip","white-tulip"],
-    ["seagrass","flowing-water","stationary-water"],
+    ["seagrass","flowing-water","stationary-water","flowing-lava","lava"],
     ["bedrock"],
-    ["coal-ore", "iron-ore", "copper-ore", "gold-ore", "redstone-ore", "lapis-lazuli-ore", "diamond-ore", "emerald-ore"]];
+    ["coal-ore", "iron-ore", "copper-ore", "gold-ore", "redstone-ore", 
+        "lapis-lazuli-ore", "diamond-ore", "emerald-ore"]];
 
 const textures = Array(300).fill()
 
@@ -103,7 +103,7 @@ for (let i = 0; i < mapSize; i++) {
     elev = Math.floor(elev*40+50+mapSize/2);
     for (let j = mapSize/2; j<=elev; j++) {
         blocks[i][j] = 8;
-        if (j<elev-10 && Math.random()<(-j+mapSize/2+100)/10000) blocks[i][j] = 9;
+        if (j<elev-10 && Math.random()<(-j+mapSize/2+100)/10000) blocks[i][j] = 203;
         if (j<elev-10 && Math.random()<(-j+mapSize/2+100)/500) blocks[i][j] = 400;
         if (j<elev-10 && Math.random()<(-j+mapSize/2+100)/2000) blocks[i][j] = 401;
         if (j<elev-10 && Math.random()<(-j+mapSize/2+100)/5000) blocks[i][j] = 402;
@@ -239,12 +239,15 @@ function checkBox(x1,y1,dx,dy) {
 }
 
 function flow(){
-    if (frame%15 !== 1) return;
+    if (frame%15 !== 0) return;
     for (let i = 0; i < mapSize; i++) {
         for (let j = mapSize/2; j < mapSize; j++) {
             try {
                 if (blocks[i][j] === 201) {
                     flood(i,j-1,false);
+                }
+                if (frame%90 === 0 && blocks[i][j] === 203) {
+                    lavaFlood(i,j-1,false);
                 }
             }
             catch (e) {}
@@ -256,6 +259,9 @@ function flow(){
                 if (blocks[i][j] === -1) {
                     blocks[i][j] = 201;
                 }
+                if (blocks[i][j] === -2) {
+                    blocks[i][j] = 203;
+                }
             }
             catch (e) {}
         }
@@ -266,9 +272,26 @@ function flood(x,y,end){
     if (blocks[x][y] === 0 || (blocks[x][y] >=100 && blocks[x][y] <200)) {
         blocks[x][y] = -1;
     }
+    else if (blocks[x][y] === 203) {
+        if (end) blocks[x][y] = 3;
+        else blocks[x][y] = 7;
+    }
     else if (!end && blocks[x][y] !== 201) {
         flood(x+1,y+1,true);
         flood(x-1,y+1,true);
+    }
+}
+
+function lavaFlood(x,y,end){
+    if (blocks[x][y] === 0 || (blocks[x][y] >=100 && blocks[x][y] <200)) {
+        blocks[x][y] = -2;
+    }
+    else if (blocks[x][y] === 201 && !end) {
+        blocks[x][y] = 8;
+    }
+    else if (!end && blocks[x][y] !== 203) {
+        lavaFlood(x+1,y+1,true);
+        lavaFlood(x-1,y+1,true);
     }
 }
 
@@ -304,6 +327,7 @@ function clickPos(placed) {
     if (x < 0 || x >= mapSize || y < 0 || y >= mapSize) {
     return;}
 
+    if (placed !== 0 && blocks[x][y] !== 0 && !(blocks[x][y] >= 100 && blocks[x][y] < 300)) return;
     if (placed === 0) {
         if (x===breakingX && y===breakingY) {breakingTime-=breakSpeed(blocks[x][y]);}
         else {breakingTime = 1.0; breakingX=x; breakingY=y;}
@@ -315,21 +339,21 @@ function clickPos(placed) {
         if (placed === 0) breakingTime = 1;
     }
     y+=1;
-    if (x >= 0 &&x < mapSize &&y >= 0 &&y < mapSize && blocks[x][y]>=100 && blocks[x][y]!==201) {
+    if (x >= 0 &&x < mapSize &&y >= 0 &&y < mapSize && blocks[x][y]>=100 && blocks[x][y]<201) {
         blocks[x][y] = 0;
     }
 }
 
 function breakSpeed(block) {
-    return 1; //comment this out after testing.
+    //return 1; //comment this out after testing.
     if (block === 900) return 0;
-    if (block === 201) return 0;
+    if (block === 201 || block === 203) return 0;
     if (block >= 400) return .03; //break speed for ores.
-    if (block >= 100 || block === 10) return 0.9;
+    if (block >= 100 || block === 10 ) return 0.9;
     if (block === 8 || block === 3 || block === 4 || block === 5 || block === 6) return .03;
     
     if (block === 7) return .0005;
-    if (block === 9) return .01;
+    if (block === 9) return .9;
     return .1;
 }
 
@@ -422,7 +446,7 @@ function gravity(){
         let bottom = player.y;
         let x = worldToBlockX(player.x + player.width / 2);
         let y = worldToBlockY(bottom - 1);
-        if (blocks[x][y]===201 || blocks[x][y]===200) player.ySpeed = -5;
+        if (blocks[x][y]===201 || blocks[x][y]===200 || blocks[x][y]===203) player.ySpeed = -5;
     }
     if (player.ySpeed < -25) {
         player.ySpeed = -25;
@@ -539,6 +563,7 @@ function draw() {
                 )
             }
             if (blocks[i][j] === 201 && blocks[i][j+1] !== 201) texture = textures[202];
+            if (blocks[i][j] === 203 && blocks[i][j+1] !== 203) texture = textures[204];
             ctx.drawImage(
                 texture,
                 screenX,
