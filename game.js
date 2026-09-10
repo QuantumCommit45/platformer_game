@@ -193,6 +193,7 @@ function foliage(x,y) {
         else blocks[x][y] = 201;
         return;
     }
+    if (y === seaFloor+mapSize/2) return;
     let num = Math.random()
     if (num < .2) makeTree(x,y);
     else if (num < .4) blocks[x][y] = 100;
