@@ -285,6 +285,10 @@ function clickPos(placed) {
     let worldY = player.y - (mouseY - yOffset - 10);
 
     let y = Math.floor(worldY / blockSize) + mapSize / 2;
+
+    if (x < 0 || x >= mapSize || y < 0 || y >= mapSize) {
+    return;}
+
     if (placed === 0) {
         if (x===breakingX && y===breakingY) {breakingTime-=breakSpeed(blocks[x][y]);}
         else {breakingTime = 1.0; breakingX=x; breakingY=y;}
