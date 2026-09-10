@@ -3,7 +3,7 @@ const ctx = canvas.getContext("2d");
 
 const params = new URLSearchParams(window.location.search);
 var seed = Math.round(Math.random()*10**10);
-if (params.has("seed")) seed = parseInt(params.get("seed"),10);
+if (params.has("seed")) seed = hashCode(params.get("seed"));
 var instaMine = false;
 if (params.has("instamine")) instaMine = (params.get("instamine")==="true");
 console.log(seed);
@@ -505,6 +505,18 @@ function updateHotbar() {
             Number(slot.dataset.block) === selectedBlock
         );
     });
+}
+
+function hashCode(str) {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+        const chr = str.charCodeAt(i);
+        // Bitwise left shift and subtraction
+        hash = (hash << 5) - hash + chr; 
+        // Convert to a 32-bit integer
+        hash |= 0; 
+    }
+    return hash;
 }
 
 // Update player
