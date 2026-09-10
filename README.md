@@ -26,8 +26,7 @@ A browser-based 2D platformer with procedurally generated terrain, built with va
 ## Contributors
 
 - QuantumCommit45 — Horizontal Collision, Caves and Ores Generation, Hotbar and Hotkeys, Bedrock Layer, Keyboard/Mouse Inputs, Coordinate Display
-- 
-DG-1000 — Gravity, Trees, Swimming, Moving Camera Positioning, Flowing Water, Noise-Based Terrain Generation, Ground Foliage
+- DG-1000 — Gravity, Trees, Swimming, Moving Camera Positioning, Flowing Water, Noise-Based Terrain Generation, Ground Foliage
 
 Built collaboratively using Git and GitHub for version control.
 
