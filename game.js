@@ -1,5 +1,6 @@
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
+ctx.lineWidth = 10;
 
 const params = new URLSearchParams(window.location.search);
 var seed = Math.round(Math.random()*10**10);
@@ -743,7 +744,6 @@ function draw() {
     );
 
     // Blocks
-    ctx.fillStyle = "black";
 
     for (let i = 0; i < mapSize; i++) {
         for (let j = mapSize/2; j < mapSize; j++) {
@@ -784,6 +784,9 @@ function draw() {
             }
             if (offline) {
                 if (blocks[i][j] < 300 && blocks[i][j] >= 100) {
+                    ctx.strokeStyle = "green";
+                    if (blocks[i][j] === 201) ctx.strokeStyle = "blue";
+                    if (blocks[i][j] === 203) ctx.strokeStyle = "orange";
                     ctx.beginPath();
                     ctx.moveTo(screenX,screenY);
                     ctx.lineTo(screenX+blockSize,screenY+blockSize);
@@ -794,6 +797,9 @@ function draw() {
                     ctx.stroke();
                 }
                 else {
+                    ctx.fillStyle = "black";
+                    if (blocks[i][j] === 1 || blocks[i][j] === 2) ctx.fillStyle = "saddleBrown";
+                    if (blocks[i][j] === 8) ctx.fillStyle = "silver";
                     ctx.fillRect(
                         screenX,
                         screenY,
