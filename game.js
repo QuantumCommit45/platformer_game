@@ -14,6 +14,8 @@ if (params.has("noclip")) noClip = (params.get("noclip")==="true");
 var noDeath = false;
 if (params.has("nodeath")) noDeath = (params.get("nodeath")==="true");
 console.log(seed);
+var offline = !window.navigator.onLine;
+if (offline) console.log("Running in offline mode");
 const generate = mulberry32(seed);
 let wasFallingFast = false;
 let damageFlash = 0;
@@ -58,22 +60,23 @@ const lavaLevel = 20;
 
 const fallSafety = 3;
 
+
 const sky = new Image();
-sky.src = "https://minecraft.wiki/images/Day_sky.png";
-
 const heart = new Image();
-heart.src = "https://minecraft.wiki/images/Heart_%28icon%29.png";
 const halfHeart = new Image();
-halfHeart.src = "https://minecraft.wiki/images/Half_Heart_%28icon%29.png";
 const noHeart = new Image();
-noHeart.src = "https://minecraft.wiki/images/Empty_Heart_%28icon%29.png";
-
 const hunger = new Image();
-hunger.src = "https://minecraft.wiki/images/Hunger_%28icon%29.png";
 const halfHunger = new Image();
-halfHunger.src = "https://minecraft.wiki/images/Half_Hunger_%28icon%29.png";
 const noHunger = new Image();
-noHunger.src = "https://minecraft.wiki/images/Empty_Hunger_%28icon%29.png";
+if (!offline) {
+    sky.src = "https://minecraft.wiki/images/Day_sky.png";
+    heart.src = "https://minecraft.wiki/images/Heart_%28icon%29.png";
+    halfHeart.src = "https://minecraft.wiki/images/Half_Heart_%28icon%29.png";
+    noHeart.src = "https://minecraft.wiki/images/Empty_Heart_%28icon%29.png";
+    hunger.src = "https://minecraft.wiki/images/Hunger_%28icon%29.png";
+    halfHunger.src = "https://minecraft.wiki/images/Half_Hunger_%28icon%29.png";
+    noHunger.src = "https://minecraft.wiki/images/Empty_Hunger_%28icon%29.png";
+}
 
 const blockTypes = [
     ["dirt","grass-block","cobblestone","oak-planks","birch-planks",
@@ -88,46 +91,48 @@ const blockTypes = [
 
 const textures = Array(300).fill()
 
-for (let i = 0; i < blockTypes[0].length; i++) {
-    textures[i+1] = new Image;
-    textures[i+1].src = "https://minecraft.wiki/images/BlockSprite_"+blockTypes[0][i]+".png";
-}
-for (let i = 0; i < blockTypes[1].length; i++) {
-    textures[i+100] = new Image;
-    textures[i+100].src = "https://minecraft.wiki/images/BlockSprite_"+blockTypes[1][i]+".png";
-}
-for (let i = 0; i < blockTypes[2].length; i++) {
-    textures[i+200] = new Image;
-    textures[i+200].src = "https://minecraft.wiki/images/BlockSprite_"+blockTypes[2][i]+".png";
-}
-for (let i = 0; i < blockTypes[3].length; i++) {
-    textures[i+900] = new Image;
-    textures[i+900].src = "https://minecraft.wiki/images/BlockSprite_"+blockTypes[3][i]+".png";
-}
-for (let i = 0; i < blockTypes[4].length; i++) {
-    textures[i+400] = new Image;
-    textures[i+400].src = "https://minecraft.wiki/images/BlockSprite_"+blockTypes[4][i]+".png";
-}
+if (!offline) {
+    for (let i = 0; i < blockTypes[0].length; i++) {
+        textures[i+1] = new Image;
+        textures[i+1].src = "https://minecraft.wiki/images/BlockSprite_"+blockTypes[0][i]+".png";
+    }
+    for (let i = 0; i < blockTypes[1].length; i++) {
+        textures[i+100] = new Image;
+        textures[i+100].src = "https://minecraft.wiki/images/BlockSprite_"+blockTypes[1][i]+".png";
+    }
+    for (let i = 0; i < blockTypes[2].length; i++) {
+        textures[i+200] = new Image;
+        textures[i+200].src = "https://minecraft.wiki/images/BlockSprite_"+blockTypes[2][i]+".png";
+    }
+    for (let i = 0; i < blockTypes[3].length; i++) {
+        textures[i+900] = new Image;
+        textures[i+900].src = "https://minecraft.wiki/images/BlockSprite_"+blockTypes[3][i]+".png";
+    }
+    for (let i = 0; i < blockTypes[4].length; i++) {
+        textures[i+400] = new Image;
+        textures[i+400].src = "https://minecraft.wiki/images/BlockSprite_"+blockTypes[4][i]+".png";
+    }
 
-textures.forEach((texture, block) => {
-    if (texture) {
-        texture.onload = () => {
-            let slot = document.querySelector(`.slot[data-block="${block}"]`);
+    textures.forEach((texture, block) => {
+        if (texture) {
+            texture.onload = () => {
+                let slot = document.querySelector(`.slot[data-block="${block}"]`);
 
-            if (slot) {
-                slot.style.backgroundImage = `url(${texture.src})`;
-            }
-        };
+                if (slot) {
+                    slot.style.backgroundImage = `url(${texture.src})`;
+                }
+            };
 
-        if (texture.complete) {
-            let slot = document.querySelector(`.slot[data-block="${block}"]`);
+            if (texture.complete) {
+                let slot = document.querySelector(`.slot[data-block="${block}"]`);
 
-            if (slot) {
-                slot.style.backgroundImage = `url(${texture.src})`;
+                if (slot) {
+                    slot.style.backgroundImage = `url(${texture.src})`;
+                }
             }
         }
-    }
-});
+    });
+}
 
 const blocks = Array.from({length: mapSize},() => Array(mapSize).fill(0));
 
@@ -723,7 +728,7 @@ function showDamageEffect() {
 // Draw everything
 function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.drawImage(sky,0,-600,800,1200);
+    if (!offline) ctx.drawImage(sky,0,-600,800,1200);
     // Camera
     yOffset = ((300 +600-player.y) +Math.sqrt((300 + player.y-600) ** 2+500)) / 2;
 
@@ -738,11 +743,12 @@ function draw() {
     );
 
     // Blocks
+    ctx.fillStyle = "black";
 
     for (let i = 0; i < mapSize; i++) {
         for (let j = mapSize/2; j < mapSize; j++) {
             if (blocks[i][j] === 0) continue;
-            texture = textures[blocks[i][j]];
+            if (!offline) texture = textures[blocks[i][j]];
             if (blocks[i][j] === 2 && (blocks[i][j+1] !== 0 && blocks[i][j+1] < 100)) texture = textures[1];
 
             // Convert block coordinates into world coordinates
@@ -754,7 +760,7 @@ function draw() {
             let screenX = worldX + offset - player.x;
 
             let screenY = yOffset - worldY + player.y - blockSize;
-            if (blocks[i][j] === 200) {
+            if (!offline && blocks[i][j] === 200) {
                 water = 201;
                 if (blocks[i][j+1] !== 201) water = 202;
                 ctx.drawImage(
@@ -765,15 +771,37 @@ function draw() {
                     blockSize
                 )
             }
-            if (blocks[i][j] === 201 && blocks[i][j+1] !== 201) texture = textures[202];
-            if (blocks[i][j] === 203 && blocks[i][j+1] !== 203) texture = textures[204];
-            ctx.drawImage(
-                texture,
-                screenX,
-                screenY,
-                blockSize,
-                blockSize
-            )
+            if (!offline) {
+                if (blocks[i][j] === 201 && blocks[i][j+1] !== 201) texture = textures[202];
+                if (blocks[i][j] === 203 && blocks[i][j+1] !== 203) texture = textures[204];
+                ctx.drawImage(
+                    texture,
+                    screenX,
+                    screenY,
+                    blockSize,
+                    blockSize
+                )
+            }
+            if (offline) {
+                if (blocks[i][j] < 300 && blocks[i][j] >= 100) {
+                    ctx.beginPath();
+                    ctx.moveTo(screenX,screenY);
+                    ctx.lineTo(screenX+blockSize,screenY+blockSize);
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.moveTo(screenX+blockSize,screenY);
+                    ctx.lineTo(screenX,screenY+blockSize);
+                    ctx.stroke();
+                }
+                else {
+                    ctx.fillRect(
+                        screenX,
+                        screenY,
+                        blockSize,
+                        blockSize
+                    )
+                }
+            }
         }
     }
 
@@ -793,6 +821,7 @@ function drawCoordinates(){
 }
 
 function drawHealth() {
+    if (offline) return;
     for (let i = 0; i < 10; i++) {
         texture = halfHeart;
         if (player.health/2-.5 < i) texture = noHeart;
