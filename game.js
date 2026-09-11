@@ -6,6 +6,7 @@ var seed = Math.round(Math.random()*10**10);
 if (params.has("seed")) seed = +params.get("seed");
 if (!(seed > 0)) seed = hashCode(params.get("seed"));
 var instaMine = false;
+var instaMine = true;
 if (params.has("instamine")) instaMine = (params.get("instamine")==="true");
 var flight = false;
 if (params.has("flight")) flight = (params.get("flight")==="true");
@@ -13,7 +14,7 @@ var noClip = false;
 if (params.has("noclip")) noClip = (params.get("noclip")==="true");
 console.log(seed);
 const generate = mulberry32(seed);
-
+let wasFallingFast = false;
 // Player
 const player = {
     x: 0,
@@ -441,12 +442,28 @@ function isSolid(block_id){
 }
 
 function verticalCollision(){
+    if (player.ySpeed < -25) {
+    wasFallingFast = true;
+}
     let oldY = player.y;
     player.y += player.ySpeed;
     let y = worldToBlockY(player.y - 1);
     let blockTop= (y - mapSize / 2) * blockSize+ blockSize
     let x = worldToBlockX(player.x + player.width / 2);
-    if (player.ySpeed < 0&&oldY>blockTop&&player.y<=blockTop&&isSolid(blocks[x][y])) {player.ySpeed = 0; player.y=blockTop}
+
+    if (
+        x >= 0 && x < mapSize &&
+        y >= 0 && y < mapSize &&
+        (blocks[x][y] === 200 ||
+         blocks[x][y] === 201 ||
+         blocks[x][y] === 203)
+    ) {
+        wasFallingFast = false;
+    }
+    if (player.ySpeed < 0&&oldY>blockTop&&player.y<=blockTop&&isSolid(blocks[x][y])) {player.ySpeed = 0; player.y=blockTop;if (wasFallingFast&&(blocks[x][y]<=200||blocks[x][y]>=300)&&blocks[x][y]!=0) {
+            player.health -= 5;
+        } wasFallingFast = false;} 
+    
 }
 
 function horizontalCollision(moveDir) {
@@ -489,15 +506,15 @@ function mapBounds(){
 }
 
 function gravity(){
-    player.ySpeed -= 1;
+    if (frame%3 === 0){player.ySpeed -= 1;}
     if (player.ySpeed < -5) {
         let bottom = player.y;
         let x = worldToBlockX(player.x + player.width / 2);
         let y = worldToBlockY(bottom - 1);
         if (blocks[x][y]===201 || blocks[x][y]===200 || blocks[x][y]===203) player.ySpeed = -5;
     }
-    if (player.ySpeed < -25) {
-        player.ySpeed = -25;
+    if (player.ySpeed < -30) {
+        player.ySpeed = -30;
     }
 }
 
@@ -687,6 +704,7 @@ function drawHealth() {
         )
     }
 }
+
 
 // Game loop
 function gameLoop() {
