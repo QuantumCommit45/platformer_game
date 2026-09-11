@@ -710,6 +710,7 @@ function respawn() {
     player.ySpeed = 0;
     player.health = 20;
     player.hunger = 20;
+    player.lastY = 0;
 }
 
 function showDamageEffect() {
