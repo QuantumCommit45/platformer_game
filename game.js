@@ -306,7 +306,7 @@ function flow(){
     for (let i = 0; i < mapSize; i++) {
         for (let j = mapSize/2; j < mapSize; j++) {
             try {
-                if (blocks[i][j] === 201) {
+                if (blocks[i][j] === 201 || blocks[i][j] === 200) {
                     flood(i,j-1,false);
                 }
                 if (frame%90 === 0 && blocks[i][j] === 203) {
