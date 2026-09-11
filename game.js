@@ -15,6 +15,8 @@ if (params.has("noclip")) noClip = (params.get("noclip")==="true");
 console.log(seed);
 const generate = mulberry32(seed);
 let wasFallingFast = false;
+let damageFlash = 0;
+let damageFlashes = 0;
 // Player
 const player = {
     x: 0,
@@ -462,6 +464,7 @@ function verticalCollision(){
     }
     if (player.ySpeed < 0&&oldY>blockTop&&player.y<=blockTop&&isSolid(blocks[x][y])) {player.ySpeed = 0; player.y=blockTop;if (wasFallingFast&&(blocks[x][y]<=200||blocks[x][y]>=300)&&blocks[x][y]!=0) {
             player.health -= 5;
+            showDamageEffect();
         } wasFallingFast = false;} 
     
 }
@@ -589,7 +592,7 @@ function checkHealth() {
     let x = worldToBlockX(player.x + player.width / 2);
     let y = worldToBlockY(player.y);
     if (frame%(4*60) === 0 && player.hunger >= 18 && player.health<20) {player.hunger-=1; player.health+=1;}
-    if (frame%30 === 0 && blocks[x][y] === 203) player.health-=4;
+    if (frame%30 === 0 && blocks[x][y] === 203) {player.health-=4;showDamageEffect();}
     if (player.health <= 0) respawn();
 }
 
@@ -607,6 +610,10 @@ function respawn() {
     player.hunger = 20;
 }
 
+function showDamageEffect() {
+    damageFlashes = 1;
+    damageFlash = 50;
+}
 
 // Draw everything
 function draw() {
@@ -667,6 +674,7 @@ function draw() {
 
     drawCoordinates();
     drawHealth();
+    drawDamageFlash();
 }
 
 function drawCoordinates(){
@@ -705,6 +713,30 @@ function drawHealth() {
     }
 }
 
+function drawDamageFlash() {
+    
+    if (damageFlashes > 0) {
+        if (damageFlash > 5) {
+            ctx.fillStyle = "rgba(255, 0, 0, 0.25)";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = "red";
+            ctx.font = "bold 40px Garamond";
+            ctx.textAlign = "center";
+            ctx.fillText("YOU ARE TAKING DAMAGE", canvas.width / 2, 100);
+        }
+
+        damageFlash--;
+
+        if (damageFlash <= 0) {
+            damageFlashes--;
+
+            if (damageFlashes > 0) {
+                damageFlash = 10;
+            }
+        }
+    }
+}
 
 // Game loop
 function gameLoop() {
