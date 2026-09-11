@@ -29,6 +29,18 @@ const player = {
     hunger: 20
 };
 
+
+const eyeOfCthulhu = {
+    active: false,
+    x: 1000,
+    y: 3500,
+    radius: 150,
+    speed: 10,
+    ySpeed: 0,
+    health: 500,
+    maxhealth:500
+};
+
 var frame = 0;
 
 // Keyboard input
@@ -570,6 +582,82 @@ function hashCode(str) {
     return hash;
 }
 
+function updateEyeOfCthulhu() {
+    if (!eyeOfCthulhu.active) return;
+
+    // Move toward player
+    let dx = player.x - eyeOfCthulhu.x;
+    let dy = player.y - eyeOfCthulhu.y;
+
+    let distance = Math.sqrt(dx * dx + dy * dy);
+
+    if (distance > 0) {
+        eyeOfCthulhu.x += (dx / distance) * eyeOfCthulhu.speed;
+        eyeOfCthulhu.y += (dy / distance) * eyeOfCthulhu.speed;
+    }
+
+    // Damage player when close
+    if (distance < eyeOfCthulhu.radius + 25) {
+        if (frame % 30 === 0) {
+            player.health -= 2;
+
+            damageFlashes = 1;
+            damageFlash = 20;
+        }
+    }
+}
+
+function drawEyeOfCthulhu() {
+    if (!eyeOfCthulhu.active) return;
+
+    let screenX =
+        canvas.width / 2 +
+        (eyeOfCthulhu.x - player.x);
+
+    let screenY =
+        canvas.height / 2 -
+        (eyeOfCthulhu.y - player.y);
+
+    // Eye
+    ctx.fillStyle = "white";
+    ctx.beginPath();
+    ctx.arc(screenX,screenY,eyeOfCthulhu.radius,0,Math.PI * 2);
+    ctx.fill();
+
+    // Pupil
+    ctx.fillStyle = "red";
+    ctx.beginPath();
+    ctx.arc(screenX,screenY,eyeOfCthulhu.radius-50,0,Math.PI * 2);
+    ctx.fill();
+    // Pupil
+    ctx.fillStyle = "blue";
+    ctx.beginPath();
+    ctx.arc(screenX,screenY,eyeOfCthulhu.radius-55,0,Math.PI * 2);
+    ctx.fill();
+    // Pupil
+    ctx.fillStyle = "cyan";
+    ctx.beginPath();
+    ctx.arc(screenX,screenY,eyeOfCthulhu.radius-65,0,Math.PI * 2);
+    ctx.fill();
+    // Pupil
+    ctx.fillStyle = "black";
+    ctx.beginPath();
+    ctx.arc(screenX,screenY,eyeOfCthulhu.radius-100,0,Math.PI * 2);
+    ctx.fill();
+}
+
+function spawnEyeOfCthulhu() {
+    if (eyeOfCthulhu.active = true) return;
+    eyeOfCthulhu.active = true;
+
+    eyeOfCthulhu.x = player.x + 500;
+    eyeOfCthulhu.y = player.y + 300;
+
+    eyeOfCthulhu.health = 500;
+}
+
+
+
 // Update player
 function update() {
 
@@ -582,8 +670,8 @@ function update() {
     flow();
     drop();
     checkHealth();
-    
-   
+    if (keys["s"]) {spawnEyeOfCthulhu();}
+    updateEyeOfCthulhu();
 
     mapBounds(); // Keep player inside horizontal map boundaries
 }
@@ -675,6 +763,7 @@ function draw() {
     drawCoordinates();
     drawHealth();
     drawDamageFlash();
+    drawEyeOfCthulhu();
 }
 
 function drawCoordinates(){
