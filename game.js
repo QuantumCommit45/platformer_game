@@ -6,7 +6,6 @@ var seed = Math.round(Math.random()*10**10);
 if (params.has("seed")) seed = +params.get("seed");
 if (!(seed > 0)) seed = hashCode(params.get("seed"));
 var instaMine = false;
-var instaMine = true;
 if (params.has("instamine")) instaMine = (params.get("instamine")==="true");
 var flight = false;
 if (params.has("flight")) flight = (params.get("flight")==="true");
@@ -26,7 +25,8 @@ const player = {
     speed: 15,
     ySpeed: 0,
     health: 20,
-    hunger: 20
+    hunger: 20,
+    lastY: 0
 };
 
 
@@ -53,6 +53,8 @@ const blockSize = 50;
 const bottom_floor = 0;
 const seaFloor = 50;
 const lavaLevel = 20;
+
+const fallSafety = 3;
 
 const sky = new Image();
 sky.src = "https://minecraft.wiki/images/Day_sky.png";
@@ -474,10 +476,10 @@ function verticalCollision(){
     ) {
         wasFallingFast = false;
     }
-    if (player.ySpeed < 0&&oldY>blockTop&&player.y<=blockTop&&isSolid(blocks[x][y])) {player.ySpeed = 0; player.y=blockTop;if (wasFallingFast&&(blocks[x][y]<=200||blocks[x][y]>=300)&&blocks[x][y]!=0) {
-            player.health -= 5;
-            showDamageEffect();
-        } wasFallingFast = false;} 
+    /*if (player.ySpeed < 0&&oldY>blockTop&&player.y<=blockTop&&isSolid(blocks[x][y])) {player.ySpeed = 0; player.y=blockTop;if (wasFallingFast&&(blocks[x][y]<=200||blocks[x][y]>=300)&&blocks[x][y]!=0) {
+        player.health -= 5;
+        showDamageEffect();
+    } wasFallingFast = false;} */
     
 }
 
@@ -521,7 +523,7 @@ function mapBounds(){
 }
 
 function gravity(){
-    if (frame%3 === 0){player.ySpeed -= 1;}
+    if (frame%1 === 0){player.ySpeed -= 1;}
     if (player.ySpeed < -5) {
         let bottom = player.y;
         let x = worldToBlockX(player.x + player.width / 2);
@@ -681,6 +683,15 @@ function checkHealth() {
     let y = worldToBlockY(player.y);
     if (frame%(4*60) === 0 && player.hunger >= 18 && player.health<20) {player.hunger-=1; player.health+=1;}
     try {if (frame%30 === 0 && blocks[x][y] === 203) {player.health-=4;showDamageEffect();}} catch (e) {}
+    if(isGrounded()) {
+        //console.log(player.lastY-player.y);
+        if (player.lastY-player.y > blockSize*fallSafety) {
+            showDamageEffect();
+            player.health-=Math.floor((player.lastY-player.y-blockSize*(fallSafety))/blockSize);
+        }
+        player.lastY = player.y
+    }
+
     if (player.health <= 0) respawn();
 }
 
