@@ -821,7 +821,14 @@ function drawCoordinates(){
 }
 
 function drawHealth() {
-    if (offline) return;
+    if (offline) {
+        ctx.fillStyle = "rgba(128, 128, 128, 0.5)";
+        ctx.font = "20px Garamond"; 
+        ctx.fillRect(5, 35, 120, 25);
+        ctx.fillStyle = "white"
+        ctx.textAlign = "center";
+        ctx.fillText(player.health+" , "+player.hunger, 65, 53);
+    }
     for (let i = 0; i < 10; i++) {
         texture = halfHeart;
         if (player.health/2-.5 < i) texture = noHeart;
