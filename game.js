@@ -22,6 +22,8 @@ const player = {
     height: 50,
     speed: 15,
     ySpeed: 0,
+    health: 20,
+    hunger: 20
 };
 
 var frame = 0;
@@ -38,7 +40,21 @@ const seaFloor = 50;
 const lavaLevel = 20;
 
 const sky = new Image();
-sky.src = "https://minecraft.wiki/images/Day_sky.png"
+sky.src = "https://minecraft.wiki/images/Day_sky.png";
+
+const heart = new Image();
+heart.src = "https://minecraft.wiki/images/Heart_%28icon%29.png";
+const halfHeart = new Image();
+halfHeart.src = "https://minecraft.wiki/images/Half_Heart_%28icon%29.png";
+const noHeart = new Image();
+noHeart.src = "https://minecraft.wiki/images/Empty_Heart_%28icon%29.png";
+
+const hunger = new Image();
+hunger.src = "https://minecraft.wiki/images/Hunger_%28icon%29.png";
+const halfHunger = new Image();
+halfHunger.src = "https://minecraft.wiki/images/Half_Hunger_%28icon%29.png";
+const noHunger = new Image();
+noHunger.src = "https://minecraft.wiki/images/Empty_Hunger_%28icon%29.png";
 
 const blockTypes = [
     ["dirt","grass-block","cobblestone","oak-planks","birch-planks",
@@ -545,22 +561,33 @@ function update() {
     mouseClicks(selectedBlock);
     flow();
     drop();
+    checkHealth();
     
-
    
 
     mapBounds(); // Keep player inside horizontal map boundaries
-    }
+}
+
+function checkHealth() {
+    let x = worldToBlockX(player.x + player.width / 2);
+    let y = worldToBlockY(player.y);
+    if (frame%(4*60) === 0 && player.hunger >= 18 && player.health<20) {player.hunger-=1; player.health+=1;}
+    if (frame%30 === 0 && blocks[x][y] === 203) player.health-=4;
+    if (player.health <= 0) respawn();
+}
 
     /* Respawn
     if (player.y < -1000) {
         respawn()
     }
     */
+
 function respawn() {
     player.x = 0;
     player.y = 3000;
     player.ySpeed = 0;
+    player.health = 20;
+    player.hunger = 20;
 }
 
 
@@ -622,6 +649,7 @@ function draw() {
     }
 
     drawCoordinates();
+    drawHealth();
 }
 
 function drawCoordinates(){
@@ -631,6 +659,33 @@ function drawCoordinates(){
     ctx.fillStyle = "white"
     ctx.textAlign = "center";
     ctx.fillText((player.x/blockSize).toFixed(1)+" , "+(player.y/blockSize).toFixed(1), 65, 23);
+}
+
+function drawHealth() {
+    for (let i = 0; i < 10; i++) {
+        texture = halfHeart;
+        if (player.health/2-.5 < i) texture = noHeart;
+        if (player.health/2-.5 > i) texture = heart;
+        ctx.drawImage(
+            texture,
+            155+22*i,
+            500,
+            25,
+            25
+        )
+    }
+    for (let i = 0; i < 10; i++) {
+        texture = halfHunger;
+        if (player.hunger/2-.5 < i) texture = noHunger;
+        if (player.hunger/2-.5 > i) texture = hunger;
+        ctx.drawImage(
+            texture,
+            616-22*i,
+            500,
+            25,
+            25
+        )
+    }
 }
 
 // Game loop
