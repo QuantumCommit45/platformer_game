@@ -3,7 +3,8 @@ const ctx = canvas.getContext("2d");
 
 const params = new URLSearchParams(window.location.search);
 var seed = Math.round(Math.random()*10**10);
-if (params.has("seed")) seed = hashCode(params.get("seed"));
+if (params.has("seed")) seed = +params.get("seed");
+if (!(seed > 0)) seed = hashCode(params.get("seed"));
 var instaMine = false;
 if (params.has("instamine")) instaMine = (params.get("instamine")==="true");
 var flight = false;
