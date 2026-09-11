@@ -11,6 +11,8 @@ var flight = false;
 if (params.has("flight")) flight = (params.get("flight")==="true");
 var noClip = false;
 if (params.has("noclip")) noClip = (params.get("noclip")==="true");
+var noDeath = false;
+if (params.has("nodeath")) noDeath = (params.get("nodeath")==="true");
 console.log(seed);
 const generate = mulberry32(seed);
 let wasFallingFast = false;
@@ -694,7 +696,7 @@ function checkHealth() {
         }
         player.lastY = player.y
     }
-
+    if (noDeath) player.health = 20;
     if (player.health <= 0) respawn();
 }
 
@@ -818,7 +820,7 @@ function drawHealth() {
 }
 
 function drawDamageFlash() {
-    
+    if (noDeath) return;
     if (damageFlashes > 0) {
         if (damageFlash > 5) {
             ctx.fillStyle = "rgba(255, 0, 0, 0.25)";
