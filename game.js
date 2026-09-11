@@ -35,6 +35,7 @@ const mapSize = 512;
 const blockSize = 50;
 const bottom_floor = 0;
 const seaFloor = 50;
+const lavaLevel = 20;
 
 const sky = new Image();
 sky.src = "https://minecraft.wiki/images/Day_sky.png"
@@ -116,7 +117,6 @@ for (let i = 0; i < mapSize; i++) {
     elev = Math.floor(elev*40+50+mapSize/2);
     for (let j = mapSize/2; j<=elev; j++) {
         blocks[i][j] = 8;
-        if (j<elev-10 && generate()<(-j+mapSize/2+100)/10000) blocks[i][j] = 203;
         if (j<elev-10 && generate()<(-j+mapSize/2+100)/500) blocks[i][j] = 400;
         if (j<elev-10 && generate()<(-j+mapSize/2+100)/2000) blocks[i][j] = 401;
         if (j<elev-10 && generate()<(-j+mapSize/2+100)/5000) blocks[i][j] = 402;
@@ -144,6 +144,7 @@ for (let i = 0; i < mapSize; i++) {
     caveX = i;
     caveY = elev-((Math.floor(generate() * 50))+10);
     }
+
     placeSeabed(i,elev+1,1,11);
     placeSeabed(i,elev+2,1,11);
     placeSeabed(i,elev+3,1,11);
@@ -154,6 +155,12 @@ for (let i = 0; i < mapSize; i++) {
     }
     blocks[i][256] = 900;
 
+}
+
+for (let i = 0; i < mapSize; i++) {
+    for (let j = mapSize/2; j<=mapSize/2+lavaLevel; j++) {
+        if (blocks[i][j] === 0) blocks[i][j] = 203;
+    }
 }
 
 function coinFlip(){
@@ -387,7 +394,7 @@ function isGrounded() {
     let y = worldToBlockY(bottom - 1);
     if (x<0||x>=mapSize||y>=mapSize) return false;
     if (bottom <= bottom_floor) return true;
-    if (blocks[x][y+1] === 200 || blocks[x][y+1] === 201) return true;
+    if (blocks[x][y+1] === 200 || blocks[x][y+1] === 201 || blocks[x][y+1] === 203) return true;
     return !!(isSolid(blocks[x][y]));
 }
 
