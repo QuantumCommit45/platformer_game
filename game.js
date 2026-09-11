@@ -427,7 +427,10 @@ function isGrounded() {
     let y = worldToBlockY(bottom - 1);
     if (x<0||x>=mapSize||y>=mapSize) return false;
     if (bottom <= bottom_floor) return true;
-    if (blocks[x][y+1] === 200 || blocks[x][y+1] === 201 || blocks[x][y+1] === 203) return true;
+    if (blocks[x][y+1] === 200 || blocks[x][y+1] === 201 || blocks[x][y+1] === 203) {
+        player.lastY=player.y;
+        return true; 
+    }
     return !!(isSolid(blocks[x][y]));
 }
 
