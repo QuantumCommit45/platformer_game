@@ -680,7 +680,7 @@ function checkHealth() {
     let x = worldToBlockX(player.x + player.width / 2);
     let y = worldToBlockY(player.y);
     if (frame%(4*60) === 0 && player.hunger >= 18 && player.health<20) {player.hunger-=1; player.health+=1;}
-    if (frame%30 === 0 && blocks[x][y] === 203) {player.health-=4;showDamageEffect();}
+    try {if (frame%30 === 0 && blocks[x][y] === 203) {player.health-=4;showDamageEffect();}} catch (e) {}
     if (player.health <= 0) respawn();
 }
 
