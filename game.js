@@ -137,25 +137,12 @@ if (!offline) {
 
 const blocks = Array.from({length: mapSize},() => Array(mapSize).fill(0));
 
-const gradients = Array(Math.floor(mapSize/20+2))
-for (let i = 0; i < Math.floor(mapSize/20+2); i++) {
-    gradients[i] = generate()*2-1;
-}
-gradients[0] = 1;
-gradients[Math.floor(mapSize/40+1)] *= .001;
-gradients[Math.floor(mapSize/40+1)] *= .001;
-gradients[Math.floor(mapSize/20+2)] = -1;
+const noise = makeSomeNoise(20);
 
 let caveX = 0;
 let caveY = mapSize / 2 + 30;
 for (let i = 0; i < mapSize; i++) {
-    let pos = i%20/20;
-    let left = Math.floor(i/20);
-    let a0 = pos*gradients[left];
-    let a1 = (1-pos)*gradients[left+1];
-    let elev = a0+(3*pos**2-2*pos**3)*(a1-a0)
-    
-    elev = Math.floor(elev*40+50+mapSize/2);
+    let elev = Math.floor(computeNoise(noise,20,i)*40+50+mapSize/2);
     for (let j = mapSize/2; j<=elev; j++) {
         blocks[i][j] = 8;
         if (j<elev-10 && generate()<(-j+mapSize/2+100)/500) blocks[i][j] = 400;
@@ -203,6 +190,27 @@ for (let i = 0; i < mapSize; i++) {
         if (blocks[i][j] === 0) blocks[i][j] = 203;
     }
 }
+
+function makeSomeNoise(gridSize) {
+    let gradients = Array(Math.floor(mapSize/gridSize+2))
+    for (let i = 0; i < Math.floor(mapSize/gridSize+2); i++) {
+        gradients[i] = generate()*2-1;
+    }
+    gradients[0] = 1;
+    gradients[Math.floor(mapSize/gridSize/2+1)] *= .001;
+    gradients[Math.floor(mapSize/gridSize/2+1)] *= .001;
+    gradients[Math.floor(mapSize/gridSize+2)] = -1;
+    return gradients;
+}
+
+function computeNoise(gradients, gridSize, x) {
+    let pos = x%gridSize/gridSize;
+    let left = Math.floor(x/gridSize);
+    let a0 = pos*gradients[left];
+    let a1 = (1-pos)*gradients[left+1];
+    return (a0+(3*pos**2-2*pos**3)*(a1-a0));
+}
+
 
 function coinFlip(){
     let coin = Math.round(generate());
@@ -695,7 +703,6 @@ function checkHealth() {
     if (frame%(4*60) === 0 && player.hunger >= 18 && player.health<20) {player.hunger-=1; player.health+=1;}
     try {if (frame%30 === 0 && blocks[x][y] === 203) {player.health-=4;showDamageEffect();}} catch (e) {}
     if(isGrounded()) {
-        //console.log(player.lastY-player.y);
         if (player.lastY-player.y > blockSize*fallSafety) {
             showDamageEffect();
             player.health-=Math.floor((player.lastY-player.y-blockSize*(fallSafety))/blockSize);
