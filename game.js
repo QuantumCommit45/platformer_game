@@ -759,9 +759,11 @@ function draw() {
     );
 
     // Blocks
+    let x = worldToBlockX(player.x + player.width / 2);
+    let y = worldToBlockY(player.y);
 
-    for (let i = 0; i < mapSize; i++) {
-        for (let j = mapSize/2; j < mapSize; j++) {
+    for (let i = Math.max(0,x-15); i < Math.min(mapSize,x+15); i++) {
+        for (let j = Math.max(mapSize/2,y-20); j < Math.min(mapSize,y+20); j++) {
             if (blocks[i][j] === 0) continue;
             if (!offline) texture = textures[blocks[i][j]];
             if (blocks[i][j] === 2 && (blocks[i][j+1] !== 0 && blocks[i][j+1] < 100)) texture = textures[1];
