@@ -137,12 +137,20 @@ if (!offline) {
 
 const blocks = Array.from({length: mapSize},() => Array(mapSize).fill(0));
 
-const noise = makeSomeNoise(20);
+const strengths = [20];
+const noises = Array(strengths.length);
+for (let i = 0; i < strengths.length; i++) {
+    noises[i] = makeSomeNoise(strengths[i]);
+}
 
 let caveX = 0;
 let caveY = mapSize / 2 + 30;
 for (let i = 0; i < mapSize; i++) {
-    let elev = Math.floor(computeNoise(noise,20,i)*40+50+mapSize/2);
+    let elev = mapSize/2+50;
+    for (let j = 0; j < strengths.length; j++) {
+        elev += computeNoise(noises[j],strengths[j],i)*strengths[j]*2;
+    }
+    elev = Math.floor(elev);
     for (let j = mapSize/2; j<=elev; j++) {
         blocks[i][j] = 8;
         if (j<elev-10 && generate()<(-j+mapSize/2+100)/500) blocks[i][j] = 400;
