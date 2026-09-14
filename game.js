@@ -24,7 +24,7 @@ let damageFlashes = 0;
 // Player
 const player = {
     x: 0,
-    y: 3000,
+    y: 4000,
     width: 30,
     height: 50,
     speed: 15,
@@ -137,7 +137,7 @@ if (!offline) {
 
 const blocks = Array.from({length: mapSize},() => Array(mapSize).fill(0));
 
-const strengths = [20];
+const strengths = [50,25,10];
 const noises = Array(strengths.length);
 for (let i = 0; i < strengths.length; i++) {
     noises[i] = makeSomeNoise(strengths[i]);
@@ -148,7 +148,7 @@ let caveY = mapSize / 2 + 30;
 for (let i = 0; i < mapSize; i++) {
     let elev = mapSize/2+50;
     for (let j = 0; j < strengths.length; j++) {
-        elev += computeNoise(noises[j],strengths[j],i)*strengths[j]*2;
+        elev += computeNoise(noises[j],strengths[j],i)*strengths[j];
     }
     elev = Math.floor(elev);
     for (let j = mapSize/2; j<=elev; j++) {
@@ -729,7 +729,7 @@ function checkHealth() {
 
 function respawn() {
     player.x = 0;
-    player.y = 3000;
+    player.y = 4000;
     player.ySpeed = 0;
     player.health = 20;
     player.hunger = 20;
