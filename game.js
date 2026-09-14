@@ -53,7 +53,7 @@ const keys = {};
 const mouse = {};
 
 
-const mapSize = 512;
+const mapSize = 1024;
 const blockSize = 50;
 const bottom_floor = 0;
 const seaFloor = 50;
@@ -137,7 +137,7 @@ if (!offline) {
 
 const blocks = Array.from({length: mapSize},() => Array(mapSize).fill(0));
 
-const strengths = [50,25,10];
+const strengths = [100,50,20,10];
 const noises = Array(strengths.length);
 for (let i = 0; i < strengths.length; i++) {
     noises[i] = makeSomeNoise(strengths[i]);
