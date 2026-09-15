@@ -25,8 +25,8 @@ let damageFlashes = 0;
 const player = {
     x: 0,
     y: 4000,
-    width: 30,
-    height: 50,
+    width: 50,
+    height: 100,
     speed: 15,
     ySpeed: 0,
     health: 20,
@@ -61,6 +61,9 @@ const lavaLevel = 20;
 
 const fallSafety = 3;
 
+
+const steve = new Image();
+steve.src = "steve.png";
 
 const sky = new Image();
 const heart = new Image();
@@ -517,7 +520,7 @@ function horizontalCollision(moveDir) {
     if (noClip) return;
 
     let yBottom = worldToBlockY(player.y + 2);
-    let yTop = worldToBlockY(player.y + player.height - 2);
+    let yTop = worldToBlockY(player.y + player.height - 11);
 
     if (moveDir > 0) {
         let x = worldToBlockX(player.x + player.width);
@@ -753,13 +756,23 @@ function draw() {
 
     // Player
     ctx.fillStyle = "cyan";
-
-    ctx.fillRect(
-        offset,
-        yOffset-player.height,
-        player.width,
-        player.height
-    );
+    if (offline) {
+        ctx.fillRect(
+            offset,
+            yOffset-player.height,
+            player.width,
+            player.height
+        );
+    }
+    else {
+        ctx.drawImage(
+            steve,
+            offset,
+            yOffset-player.height,
+            player.width,
+            player.height
+        )
+    }
 
     // Blocks
     let x = worldToBlockX(player.x + player.width / 2);
