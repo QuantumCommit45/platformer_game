@@ -81,7 +81,8 @@ if (!offline) {
 
 const blockTypes = [
     ["dirt","grass-block","cobblestone","oak-planks","birch-planks",
-        "oak-log","obsidian","stone","glass","oak-leaves","gravel","pumpkin","melon"],
+        "oak-log","obsidian","stone","glass","oak-leaves",
+        "gravel","pumpkin","melon"],
     ["short-grass","allium","azure-bluet","blue-orchid","cornflower",
         "dandelion","lily-of-the-valley","oxeye-daisy","poppy","orange-tulip",
         "pink-tulip","red-tulip","white-tulip"],
@@ -422,6 +423,7 @@ function clickPos(placed) {
     }
     if (x >= 0 &&x < mapSize &&y >= 0 &&y < mapSize) {
         if (blocks[x][y] === 200) {blocks[x][y] = 201; breakingTime = 1; return;}
+        if ((blocks[x][y] === 12 || blocks[x][y] === 13) && placed === 0) player.hunger+=5;
         blocks[x][y] = placed;
         if (placed === 0) breakingTime = 1;
     }
@@ -706,6 +708,7 @@ function update() {
 }
 
 function checkHealth() {
+    player.hunger = Math.min(player.hunger,20);
     let x = worldToBlockX(player.x + player.width / 2);
     let y = worldToBlockY(player.y);
     if (frame%(4*60) === 0 && player.hunger >= 18 && player.health<20) {player.hunger-=1; player.health+=1;}
