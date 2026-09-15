@@ -63,7 +63,7 @@ const fallSafety = 3;
 
 
 const steve = new Image();
-steve.src = "steve.png";
+steve.src = "steveleft.png";
 
 const sky = new Image();
 const heart = new Image();
@@ -572,8 +572,8 @@ function movementKeys(){
     if (grounded) snapToPlatform();
     if (grounded && keys["w"]) player.ySpeed = 15;
     let moveDir = 0;
-    if (keys["a"]) { player.x -= player.speed; moveDir = -1; }
-    if (keys["d"]) { player.x += player.speed; moveDir = 1; }
+    if (keys["a"]) { player.x -= player.speed; moveDir = -1; ;steve.src = "steveleft.png";}
+    if (keys["d"]) { player.x += player.speed; moveDir = 1; steve.src = "steveright.png";}
     horizontalCollision(moveDir);
 }
 
