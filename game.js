@@ -21,6 +21,7 @@ const generate = mulberry32(seed);
 let wasFallingFast = false;
 let damageFlash = 0;
 let damageFlashes = 0;
+
 // Player
 const player = {
     x: 0,
@@ -63,7 +64,7 @@ const fallSafety = 3;
 
 
 const steve = new Image();
-steve.src = "steveleft.png";
+steve.src = "steveLeft.png";
 
 const sky = new Image();
 const heart = new Image();
@@ -572,8 +573,8 @@ function movementKeys(){
     if (grounded) snapToPlatform();
     if (grounded && keys["w"]) player.ySpeed = 15;
     let moveDir = 0;
-    if (keys["a"]) { player.x -= player.speed; moveDir = -1; ;steve.src = "steveleft.png";}
-    if (keys["d"]) { player.x += player.speed; moveDir = 1; steve.src = "steveright.png";}
+    if (keys["a"]) { player.x -= player.speed; moveDir = -1; ;steve.src = "steveLeft.png";}
+    if (keys["d"]) { player.x += player.speed; moveDir = 1; steve.src = "steveRight.png";}
     horizontalCollision(moveDir);
 }
 
@@ -726,12 +727,6 @@ function checkHealth() {
     if (noDeath) player.health = 20;
     if (player.health <= 0) respawn();
 }
-
-    /* Respawn
-    if (player.y < -1000) {
-        respawn()
-    }
-    */
 
 function respawn() {
     player.x = 0;
