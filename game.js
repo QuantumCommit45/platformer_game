@@ -453,11 +453,11 @@ function breakSpeed(block) {
     if (block === 201 || block === 203) return 0;
     if (instaMine) return 100;
     if (block === 900) return 0;
-    if (block >= 400) return 2; //break speed for ores.
+    if (block >= 400) return 1.25; //break speed for ores.
     if (block >= 100 || block === 10 ) return 30;
-    if (block === 8 || block === 3 || block === 4 || block === 5 || block === 6) return 2;
+    if (block === 8 || block === 3 || block === 4 || block === 5 || block === 6) return 2.5;
     
-    if (block === 7) return .03;
+    if (block === 7) return 1/42;
     if (block === 9) return 30;
     return 6;
 }
