@@ -27,7 +27,7 @@ const player = {
     y: 4000,
     width: 50,
     height: 100,
-    speed: 1000,
+    speed: 50*5.612,
     ySpeed: 0,
     health: 20,
     hunger: 20,
@@ -66,7 +66,7 @@ const seaFloor = 50;
 const lavaLevel = 20;
 
 const fallSafety = 3;
-const terminalVelocity = -2000
+const terminalVelocity = -5000
 const waterSpeed = -250;
 
 
@@ -553,7 +553,7 @@ function mapBounds(){
 }
 
 function gravity(){
-    player.ySpeed -= 3000*deltaTime;
+    player.ySpeed -= 1600*deltaTime;
     if (player.ySpeed < waterSpeed) {
         let bottom = player.y;
         let x = worldToBlockX(player.x + player.width / 2);
@@ -569,7 +569,7 @@ function movementKeys(){
     let grounded = isGrounded();
     if (grounded && player.ySpeed < waterSpeed) player.ySpeed = waterSpeed;
     if (grounded) snapToPlatform();
-    if (grounded && keys["w"]) player.ySpeed = 830;
+    if (grounded && keys["w"]) player.ySpeed = 650;
     let moveDir = 0;
     if (keys["a"]) { player.x -= player.speed*deltaTime; moveDir = -1; ;steve.src = "steveLeft.png";}
     if (keys["d"]) { player.x += player.speed*deltaTime; moveDir = 1; steve.src = "steveRight.png";}
