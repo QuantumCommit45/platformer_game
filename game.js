@@ -18,7 +18,6 @@ console.log(seed);
 var offline = !window.navigator.onLine;
 if (offline) console.log("Running in offline mode");
 const generate = mulberry32(seed);
-let wasFallingFast = false;
 let damageFlash = 0;
 let damageFlashes = 0;
 
@@ -503,29 +502,14 @@ function isSolid(block_id){
 }
 
 function verticalCollision(){
-    if (player.ySpeed < -400) {
-    wasFallingFast = true;
-}
-    let oldY = player.y;
-    player.y += player.ySpeed*deltaTime;
-    let y = worldToBlockY(player.y - 1);
-    let blockTop= (y - mapSize / 2) * blockSize+ blockSize
-    let x = worldToBlockX(player.x + player.width / 2);
-
-    if (
-        x >= 0 && x < mapSize &&
-        y >= 0 && y < mapSize &&
-        (blocks[x][y] === 200 ||
-         blocks[x][y] === 201 ||
-         blocks[x][y] === 203)
-    ) {
-        wasFallingFast = false;
+    let dist = player.ySpeed*deltaTime;
+    while (dist < -25) {
+        dist += 25;
+        player.y -= 25;
+        if (isGrounded()) snapToPlatform();
     }
-    /*if (player.ySpeed < 0&&oldY>blockTop&&player.y<=blockTop&&isSolid(blocks[x][y])) {player.ySpeed = 0; player.y=blockTop;if (wasFallingFast&&(blocks[x][y]<=200||blocks[x][y]>=300)&&blocks[x][y]!=0) {
-        player.health -= 5;
-        showDamageEffect();
-    } wasFallingFast = false;} */
-    
+    player.y += dist;
+
 }
 
 function horizontalCollision(moveDir) {
