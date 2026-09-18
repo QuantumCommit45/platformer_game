@@ -495,6 +495,7 @@ function outOfBounds() {
 }
 
 function isSolid(block_id){
+    if (block_id === 6 || block_id === 10) return false
     if (block_id !== 0 && block_id <100 || block_id === 900 || block_id >= 400){
         return true
     }
